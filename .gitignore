@@ -1,0 +1,13 @@
+/target/
+**/*.rs.bk
+__pycache__/
+*.pyc
+.pytest_cache/
+.ruff_cache/
+.venv/
+# generated artifacts
+/out/
+/fixtures/generated/
+*.mpt
+!tests/data/*.mpt
+bench/results/
