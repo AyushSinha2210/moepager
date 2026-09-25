@@ -33,7 +33,7 @@ of the project.
 - [ ] P1.5 CI workflow (fmt, clippy, tests, ruff, pytest, demo smoke)
 
 ### Phase 2 — GGUF map
-- [ ] P2.1 ggml type table (block size, type size) incl. K-quants, IQ, MXFP4
+- [x] P2.1 ggml type table (block size, type size) incl. K-quants, IQ, MXFP4
 - [ ] P2.2 GGUF v2/v3 header parser (metadata KV, tensor infos, alignment, data offset)
 - [x] P2.3 Python independent fixture writer + generated fixtures
 - [ ] P2.4 ExpertMap: units, slices (3-D weights, 2-D bias rows), page sets, shared boundary pages
