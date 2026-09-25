@@ -31,7 +31,7 @@ fmt:
 	cd python && $(RUFF) format .
 
 fixtures:
-	$(PY) python/moepager_tools/gguf_fixtures.py fixtures/generated
+	$(PY) python/moepager_tools/gguf_fixtures.py fixtures/generated --big
 
 clean:
 	$(CARGO) clean

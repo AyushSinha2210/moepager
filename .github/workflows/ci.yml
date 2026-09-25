@@ -21,7 +21,7 @@ jobs:
       - name: clippy
         run: cargo clippy --workspace --all-targets -- -D warnings
       - name: fixtures
-        run: python3 python/moepager_tools/gguf_fixtures.py fixtures/generated
+        run: python3 python/moepager_tools/gguf_fixtures.py fixtures/generated --big
       - name: test
         run: cargo test --workspace
       - name: demo smoke

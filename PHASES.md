@@ -35,7 +35,7 @@ of the project.
 ### Phase 2 — GGUF map
 - [ ] P2.1 ggml type table (block size, type size) incl. K-quants, IQ, MXFP4
 - [ ] P2.2 GGUF v2/v3 header parser (metadata KV, tensor infos, alignment, data offset)
-- [ ] P2.3 Python independent fixture writer + generated fixtures
+- [x] P2.3 Python independent fixture writer + generated fixtures
 - [ ] P2.4 ExpertMap: units, slices (3-D weights, 2-D bias rows), page sets, shared boundary pages
 - [ ] P2.5 Reverse lookup page → (unit, slice) / dense region; sentinel pages
 - [ ] P2.6 `moepager gguf-map` CLI → map.json + summary
