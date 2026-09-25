@@ -1,0 +1,45 @@
+[workspace]
+resolver = "2"
+members = [
+    "crates/mp-gguf",
+    "crates/mp-trace",
+    "crates/mp-core",
+    "crates/mp-synth",
+    "crates/mp-analyze",
+    "crates/mp-sim",
+    "crates/mp-os",
+    "crates/mp-recorder",
+    "crates/moepager",
+    "crates/moepagerd",
+]
+
+[workspace.package]
+version = "0.1.0"
+edition = "2021"
+license = "MIT OR Apache-2.0"
+rust-version = "1.80"
+
+[workspace.dependencies]
+anyhow = "1"
+thiserror = "2"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+clap = { version = "4", features = ["derive"] }
+libc = "0.2"
+mp-gguf = { path = "crates/mp-gguf" }
+mp-trace = { path = "crates/mp-trace" }
+mp-core = { path = "crates/mp-core" }
+mp-synth = { path = "crates/mp-synth" }
+mp-analyze = { path = "crates/mp-analyze" }
+mp-sim = { path = "crates/mp-sim" }
+mp-os = { path = "crates/mp-os" }
+mp-recorder = { path = "crates/mp-recorder" }
+
+[workspace.lints.rust]
+unsafe_op_in_unsafe_fn = "deny"
+
+[workspace.lints.clippy]
+dbg_macro = "warn"
+
+[profile.release]
+debug = 1

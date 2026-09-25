@@ -1,0 +1,21 @@
+[package]
+name = "moepagerd"
+description = "moepager daemon"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+rust-version.workspace = true
+
+[lints]
+workspace = true
+
+[dependencies]
+mp-gguf.workspace = true
+mp-trace.workspace = true
+mp-core.workspace = true
+mp-os.workspace = true
+mp-recorder.workspace = true
+anyhow.workspace = true
+clap.workspace = true
+serde.workspace = true
+serde_json.workspace = true

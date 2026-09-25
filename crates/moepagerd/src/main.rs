@@ -1,0 +1,3 @@
+//! moepager daemon
+
+fn main() {}

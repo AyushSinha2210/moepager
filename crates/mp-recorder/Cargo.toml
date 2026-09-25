@@ -1,0 +1,17 @@
+[package]
+name = "mp-recorder"
+description = "Black-box page-cache recorders and trace converters"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+rust-version.workspace = true
+
+[lints]
+workspace = true
+
+[dependencies]
+mp-gguf.workspace = true
+mp-os.workspace = true
+mp-trace.workspace = true
+anyhow.workspace = true
+serde_json.workspace = true
