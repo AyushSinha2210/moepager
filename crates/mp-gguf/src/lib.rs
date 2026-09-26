@@ -4,6 +4,7 @@
 
 pub mod map;
 pub mod parse;
+pub mod repack;
 pub mod types;
 
 pub use map::{ExpertMap, Owner, PageIndex, Slice, Unit};

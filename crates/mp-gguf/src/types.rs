@@ -16,38 +16,198 @@ struct Info {
 }
 
 const TABLE: &[Info] = &[
-    Info { id: 0, name: "F32", block: 1, size: 4 },
-    Info { id: 1, name: "F16", block: 1, size: 2 },
-    Info { id: 2, name: "Q4_0", block: 32, size: 18 },
-    Info { id: 3, name: "Q4_1", block: 32, size: 20 },
-    Info { id: 6, name: "Q5_0", block: 32, size: 22 },
-    Info { id: 7, name: "Q5_1", block: 32, size: 24 },
-    Info { id: 8, name: "Q8_0", block: 32, size: 34 },
-    Info { id: 9, name: "Q8_1", block: 32, size: 36 },
-    Info { id: 10, name: "Q2_K", block: 256, size: 84 },
-    Info { id: 11, name: "Q3_K", block: 256, size: 110 },
-    Info { id: 12, name: "Q4_K", block: 256, size: 144 },
-    Info { id: 13, name: "Q5_K", block: 256, size: 176 },
-    Info { id: 14, name: "Q6_K", block: 256, size: 210 },
-    Info { id: 15, name: "Q8_K", block: 256, size: 292 },
-    Info { id: 16, name: "IQ2_XXS", block: 256, size: 66 },
-    Info { id: 17, name: "IQ2_XS", block: 256, size: 74 },
-    Info { id: 18, name: "IQ3_XXS", block: 256, size: 98 },
-    Info { id: 19, name: "IQ1_S", block: 256, size: 50 },
-    Info { id: 20, name: "IQ4_NL", block: 32, size: 18 },
-    Info { id: 21, name: "IQ3_S", block: 256, size: 110 },
-    Info { id: 22, name: "IQ2_S", block: 256, size: 82 },
-    Info { id: 23, name: "IQ4_XS", block: 256, size: 136 },
-    Info { id: 24, name: "I8", block: 1, size: 1 },
-    Info { id: 25, name: "I16", block: 1, size: 2 },
-    Info { id: 26, name: "I32", block: 1, size: 4 },
-    Info { id: 27, name: "I64", block: 1, size: 8 },
-    Info { id: 28, name: "F64", block: 1, size: 8 },
-    Info { id: 29, name: "IQ1_M", block: 256, size: 56 },
-    Info { id: 30, name: "BF16", block: 1, size: 2 },
-    Info { id: 34, name: "TQ1_0", block: 256, size: 54 },
-    Info { id: 35, name: "TQ2_0", block: 256, size: 66 },
-    Info { id: 39, name: "MXFP4", block: 32, size: 17 },
+    Info {
+        id: 0,
+        name: "F32",
+        block: 1,
+        size: 4,
+    },
+    Info {
+        id: 1,
+        name: "F16",
+        block: 1,
+        size: 2,
+    },
+    Info {
+        id: 2,
+        name: "Q4_0",
+        block: 32,
+        size: 18,
+    },
+    Info {
+        id: 3,
+        name: "Q4_1",
+        block: 32,
+        size: 20,
+    },
+    Info {
+        id: 6,
+        name: "Q5_0",
+        block: 32,
+        size: 22,
+    },
+    Info {
+        id: 7,
+        name: "Q5_1",
+        block: 32,
+        size: 24,
+    },
+    Info {
+        id: 8,
+        name: "Q8_0",
+        block: 32,
+        size: 34,
+    },
+    Info {
+        id: 9,
+        name: "Q8_1",
+        block: 32,
+        size: 36,
+    },
+    Info {
+        id: 10,
+        name: "Q2_K",
+        block: 256,
+        size: 84,
+    },
+    Info {
+        id: 11,
+        name: "Q3_K",
+        block: 256,
+        size: 110,
+    },
+    Info {
+        id: 12,
+        name: "Q4_K",
+        block: 256,
+        size: 144,
+    },
+    Info {
+        id: 13,
+        name: "Q5_K",
+        block: 256,
+        size: 176,
+    },
+    Info {
+        id: 14,
+        name: "Q6_K",
+        block: 256,
+        size: 210,
+    },
+    Info {
+        id: 15,
+        name: "Q8_K",
+        block: 256,
+        size: 292,
+    },
+    Info {
+        id: 16,
+        name: "IQ2_XXS",
+        block: 256,
+        size: 66,
+    },
+    Info {
+        id: 17,
+        name: "IQ2_XS",
+        block: 256,
+        size: 74,
+    },
+    Info {
+        id: 18,
+        name: "IQ3_XXS",
+        block: 256,
+        size: 98,
+    },
+    Info {
+        id: 19,
+        name: "IQ1_S",
+        block: 256,
+        size: 50,
+    },
+    Info {
+        id: 20,
+        name: "IQ4_NL",
+        block: 32,
+        size: 18,
+    },
+    Info {
+        id: 21,
+        name: "IQ3_S",
+        block: 256,
+        size: 110,
+    },
+    Info {
+        id: 22,
+        name: "IQ2_S",
+        block: 256,
+        size: 82,
+    },
+    Info {
+        id: 23,
+        name: "IQ4_XS",
+        block: 256,
+        size: 136,
+    },
+    Info {
+        id: 24,
+        name: "I8",
+        block: 1,
+        size: 1,
+    },
+    Info {
+        id: 25,
+        name: "I16",
+        block: 1,
+        size: 2,
+    },
+    Info {
+        id: 26,
+        name: "I32",
+        block: 1,
+        size: 4,
+    },
+    Info {
+        id: 27,
+        name: "I64",
+        block: 1,
+        size: 8,
+    },
+    Info {
+        id: 28,
+        name: "F64",
+        block: 1,
+        size: 8,
+    },
+    Info {
+        id: 29,
+        name: "IQ1_M",
+        block: 256,
+        size: 56,
+    },
+    Info {
+        id: 30,
+        name: "BF16",
+        block: 1,
+        size: 2,
+    },
+    Info {
+        id: 34,
+        name: "TQ1_0",
+        block: 256,
+        size: 54,
+    },
+    Info {
+        id: 35,
+        name: "TQ2_0",
+        block: 256,
+        size: 66,
+    },
+    Info {
+        id: 39,
+        name: "MXFP4",
+        block: 32,
+        size: 17,
+    },
 ];
 
 impl GgmlType {
@@ -68,7 +228,8 @@ impl GgmlType {
 
     /// Human-readable name, or `TYPE<id>` for unknown ids.
     pub fn name(self) -> String {
-        self.info().map_or_else(|| format!("TYPE{}", self.0), |i| i.name.to_string())
+        self.info()
+            .map_or_else(|| format!("TYPE{}", self.0), |i| i.name.to_string())
     }
 
     /// (elements per block, bytes per block), if the type is known.

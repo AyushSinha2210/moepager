@@ -187,3 +187,26 @@ fn real_headers_if_available() {
     assert_eq!(m.units[0].bytes, 884_736 * 2 + 1_290_240);
     assert!(m.warnings.is_empty(), "{:?}", m.warnings);
 }
+
+#[test]
+fn repack_report_on_fixture() {
+    use mp_gguf::repack::{repack_report, CpuFeatures};
+    let p = fixtures().join("tiny_moe.gguf");
+    let h = parse_file(&p).unwrap();
+    let m = ExpertMap::from_header(&h, 4096, None);
+    let avx2 = CpuFeatures {
+        x86_avx2: true,
+        ..Default::default()
+    };
+    let r = repack_report(&h, &m, &avx2);
+    // up/gate are Q4_K in every layer; down is Q4_K in layer 1 only.
+    let names: Vec<&str> = r.expert_tensors.iter().map(|(n, _)| n.as_str()).collect();
+    assert!(names.contains(&"blk.0.ffn_up_exps.weight"));
+    assert!(names.contains(&"blk.1.ffn_down_exps.weight"));
+    assert!(!names.contains(&"blk.0.ffn_down_exps.weight"));
+    assert!(r.fraction() > 0.5 && r.fraction() < 1.0);
+    assert_eq!(
+        repack_report(&h, &m, &CpuFeatures::default()).fraction(),
+        0.0
+    );
+}
