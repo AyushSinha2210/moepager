@@ -47,7 +47,11 @@ pub enum MetaValue {
     I64(i64),
     F64(f64),
     /// `items` is empty when `len > 64`.
-    Array { elem_type: u32, len: u64, items: Vec<MetaValue> },
+    Array {
+        elem_type: u32,
+        len: u64,
+        items: Vec<MetaValue>,
+    },
 }
 
 impl MetaValue {
@@ -108,7 +112,8 @@ impl GgufHeader {
     /// `<arch>.<suffix>` as an integer, e.g. `arch_u64("expert_count")`.
     pub fn arch_u64(&self, suffix: &str) -> Option<u64> {
         let arch = self.arch()?;
-        self.get(&format!("{arch}.{suffix}")).and_then(MetaValue::as_u64)
+        self.get(&format!("{arch}.{suffix}"))
+            .and_then(MetaValue::as_u64)
     }
 
     /// Byte size of a tensor: from the type table, or, for unknown types,
@@ -193,7 +198,11 @@ impl<R: Read> Rd<R> {
                         items.push(v);
                     }
                 }
-                MetaValue::Array { elem_type, len, items }
+                MetaValue::Array {
+                    elem_type,
+                    len,
+                    items,
+                }
             }
             10 => MetaValue::U64(self.u64()?),
             11 => MetaValue::I64(self.u64()? as i64),
@@ -217,7 +226,9 @@ pub fn parse_header<R: Read>(r: R) -> Result<GgufHeader, GgufError> {
     let n_tensors = rd.u64()?;
     let n_kv = rd.u64()?;
     if n_tensors > MAX_TENSORS || n_kv > MAX_KV {
-        return Err(GgufError::Corrupt(format!("{n_tensors} tensors / {n_kv} kv")));
+        return Err(GgufError::Corrupt(format!(
+            "{n_tensors} tensors / {n_kv} kv"
+        )));
     }
     let mut metadata = BTreeMap::new();
     for _ in 0..n_kv {
@@ -244,12 +255,25 @@ pub fn parse_header<R: Read>(r: R) -> Result<GgufHeader, GgufError> {
         let ty = GgmlType(rd.u32()?);
         let offset = rd.u64()?;
         if offset % alignment != 0 {
-            return Err(GgufError::Corrupt(format!("tensor {name}: unaligned offset {offset}")));
+            return Err(GgufError::Corrupt(format!(
+                "tensor {name}: unaligned offset {offset}"
+            )));
         }
-        tensors.push(TensorInfo { name, dims, ty, offset });
+        tensors.push(TensorInfo {
+            name,
+            dims,
+            ty,
+            offset,
+        });
     }
     let data_offset = rd.pos.div_ceil(alignment) * alignment;
-    Ok(GgufHeader { version, alignment, metadata, tensors, data_offset })
+    Ok(GgufHeader {
+        version,
+        alignment,
+        metadata,
+        tensors,
+        data_offset,
+    })
 }
 
 /// Parse the header of a GGUF file on disk.
@@ -301,8 +325,14 @@ mod tests {
 
     #[test]
     fn rejects_bad_magic_version_and_truncation() {
-        assert!(matches!(parse_header(&b"GGUX\x03\0\0\0"[..]), Err(GgufError::BadMagic)));
-        assert!(matches!(parse_header(&minimal(1)[..]), Err(GgufError::Version(1))));
+        assert!(matches!(
+            parse_header(&b"GGUX\x03\0\0\0"[..]),
+            Err(GgufError::BadMagic)
+        ));
+        assert!(matches!(
+            parse_header(&minimal(1)[..]),
+            Err(GgufError::Version(1))
+        ));
         let b = minimal(3);
         for cut in [5, 20, b.len() - 1] {
             assert!(parse_header(&b[..cut]).is_err(), "cut at {cut}");
