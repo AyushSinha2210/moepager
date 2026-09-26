@@ -6,7 +6,9 @@ use std::path::Path;
 
 use serde::{Deserialize, Serialize};
 
+pub mod steps;
 
+pub use steps::{infer_tokens, Step, Steps};
 
 pub const MAGIC: &[u8; 8] = b"MPTRACE\0";
 pub const VERSION: u16 = 1;
