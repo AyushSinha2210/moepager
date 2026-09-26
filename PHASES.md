@@ -44,7 +44,7 @@ of the project.
 ### Phase 3 — Traces, synthetic generator, analyzer
 - [x] P3.1 Trace format spec + reader/writer (expert and page records), CSV export
 - [x] P3.2 Token-boundary inference for black-box traces
-- [ ] P3.3 Deterministic RNG (SplitMix64/xoshiro256**) + Zipf sampler
+- [x] P3.3 Deterministic RNG (SplitMix64/xoshiro256**) + Zipf sampler
 - [ ] P3.4 Synthetic generator: layers, experts, top-k, skew, cross-layer affinity, reuse, drift, timing
 - [ ] P3.5 Analyzer: reuse distance (units, bytes), exact LRU miss-ratio curve
 - [ ] P3.6 Analyzer: transitions + top-m recall, token reuse, popularity, per-layer timing
