@@ -38,7 +38,7 @@ of the project.
 - [x] P2.3 Python independent fixture writer + generated fixtures
 - [x] P2.4 ExpertMap: units, slices (3-D weights, 2-D bias rows), page sets, shared boundary pages
 - [x] P2.5 Reverse lookup page → (unit, slice) / dense region; sentinel pages
-- [ ] P2.6 `moepager gguf-map` CLI → map.json + summary
+- [x] P2.6 `moepager gguf-map` CLI → map.json + summary
 - [x] P2.7 Repack-risk detection (types × host CPU flags) with warning
 
 ### Phase 3 — Traces, synthetic generator, analyzer
