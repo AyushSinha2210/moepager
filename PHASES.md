@@ -51,7 +51,7 @@ of the project.
 - [x] P3.7 `moepager synth` / `moepager analyze` CLIs
 
 ### Phase 4 — Simulator and policies
-- [ ] P4.1 mp-core OnlineStats (full and miss-only observation regimes)
+- [x] P4.1 mp-core OnlineStats (full and miss-only observation regimes)
 - [ ] P4.2 mp-core ResidencyEngine (V(e), budget, hysteresis, exploration)
 - [ ] P4.3 mp-core PrefetchPlanner (transition scores, deadline budget) + completion readahead flag
 - [ ] P4.4 Simulator engine: byte-capacity cache, FIFO I/O channel, stall accounting

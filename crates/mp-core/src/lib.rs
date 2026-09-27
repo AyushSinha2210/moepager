@@ -4,6 +4,8 @@
 
 pub mod cost;
 pub mod rng;
+pub mod stats;
 
 pub use cost::CostModel;
 pub use rng::{Rng, Zipf};
+pub use stats::{OnlineStats, Seen};
