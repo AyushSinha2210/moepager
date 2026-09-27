@@ -10,10 +10,13 @@
 //! * Demotion of another process's pages needs `process_madvise` with
 //!   `CAP_SYS_NICE`.
 
-
+pub mod linux;
 pub mod maps;
 pub mod mock;
 
+pub use linux::{
+    cachestat, drop_file_cache, memlock_limit, CacheStat, LinuxOps, MappedFile, TargetMapping,
+};
 pub use maps::{find_file_mapping, kernel_dev_of_mapping, parse_maps_line, MapEntry};
 pub use mock::{MockOps, OpCall};
 

@@ -66,7 +66,7 @@ phase 5 (OS layer, recorder, daemon skeleton).
 
 ### Phase 5 — Recorder and daemon skeleton
 - [x] P5.1 mp-os traits + MockOps
-- [ ] P5.2 Linux probes: mincore, cachestat; Linux ops: fadvise, mlock, process_madvise, /proc/pid/maps lookup
+- [x] P5.2 Linux probes: mincore, cachestat; Linux ops: fadvise, mlock, process_madvise, /proc/pid/maps lookup
 - [ ] P5.3 Full-scan mincore diff recorder (page trace)
 - [ ] P5.4 Sentinel recorder (expert trace, miss-only)
 - [ ] P5.5 page→expert conversion; bpftrace script + ingest
@@ -120,6 +120,14 @@ phase 5 (OS layer, recorder, daemon skeleton).
   inflates and prefetch competes with demand misses. On synthetic traces this
   wastes ≈0.4 GB/token. The daemon only sees wall time, so a fix needs a
   compute-time estimate (e.g. the minimum gap over recent tokens). Open.
+
+- btrfs device quirk: `stat()` reports the subvolume's anonymous device
+  (0:45 here), while /proc/pid/maps and the filemap tracepoints use the
+  superblock device (0:23). Mapping lookup therefore matches on inode plus
+  device-or-path, and the eBPF filter must learn `s_dev` from our own
+  /proc/self/maps (`kernel_dev_of_mapping`), not from `stat()`.
+- `process_madvise(MADV_COLD)` demotion is implemented but untested: it
+  needs `CAP_SYS_NICE` and a running engine.
 
 ## Decision log
 
