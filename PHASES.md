@@ -48,7 +48,7 @@ of the project.
 - [x] P3.4 Synthetic generator: layers, experts, top-k, skew, cross-layer affinity, reuse, drift, timing
 - [x] P3.5 Analyzer: reuse distance (units, bytes), exact LRU miss-ratio curve
 - [x] P3.6 Analyzer: transitions + top-m recall, token reuse, popularity, per-layer timing
-- [ ] P3.7 `moepager synth` / `moepager analyze` CLIs
+- [x] P3.7 `moepager synth` / `moepager analyze` CLIs
 
 ### Phase 4 — Simulator and policies
 - [ ] P4.1 mp-core OnlineStats (full and miss-only observation regimes)
