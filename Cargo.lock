@@ -216,7 +216,9 @@ dependencies = [
 name = "mp-sim"
 version = "0.1.0"
 dependencies = [
+ "mp-analyze",
  "mp-core",
+ "mp-synth",
  "mp-trace",
  "serde",
  "serde_json",

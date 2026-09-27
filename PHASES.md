@@ -56,7 +56,7 @@ of the project.
 - [x] P4.3 mp-core PrefetchPlanner (transition scores, deadline budget) + completion readahead flag
 - [x] P4.4 Simulator engine: byte-capacity cache, FIFO I/O channel, stall accounting
 - [x] P4.5 Policies: LRU, LFU, prefix-pin, static-freq oracle, V-residency, V+prefetch, Belady*
-- [ ] P4.6 Cross-check: simulated LRU == analyzer MRC
+- [x] P4.6 Cross-check: simulated LRU == analyzer MRC
 - [ ] P4.7 `moepager sim` CLI: policy × budget sweep → CSV/markdown table
 
 ### Phase 5 — Recorder and daemon skeleton

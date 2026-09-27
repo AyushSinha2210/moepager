@@ -14,3 +14,7 @@ mp-core.workspace = true
 mp-trace.workspace = true
 serde.workspace = true
 serde_json.workspace = true
+
+[dev-dependencies]
+mp-synth.workspace = true
+mp-analyze.workspace = true
