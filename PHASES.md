@@ -54,7 +54,7 @@ of the project.
 - [x] P4.1 mp-core OnlineStats (full and miss-only observation regimes)
 - [x] P4.2 mp-core ResidencyEngine (V(e), budget, hysteresis, exploration)
 - [x] P4.3 mp-core PrefetchPlanner (transition scores, deadline budget) + completion readahead flag
-- [ ] P4.4 Simulator engine: byte-capacity cache, FIFO I/O channel, stall accounting
+- [x] P4.4 Simulator engine: byte-capacity cache, FIFO I/O channel, stall accounting
 - [ ] P4.5 Policies: LRU, LFU, prefix-pin, static-freq oracle, V-residency, V+prefetch, Belady*
 - [ ] P4.6 Cross-check: simulated LRU == analyzer MRC
 - [ ] P4.7 `moepager sim` CLI: policy × budget sweep → CSV/markdown table
