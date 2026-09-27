@@ -46,7 +46,7 @@ of the project.
 - [x] P3.2 Token-boundary inference for black-box traces
 - [x] P3.3 Deterministic RNG (SplitMix64/xoshiro256**) + Zipf sampler
 - [x] P3.4 Synthetic generator: layers, experts, top-k, skew, cross-layer affinity, reuse, drift, timing
-- [ ] P3.5 Analyzer: reuse distance (units, bytes), exact LRU miss-ratio curve
+- [x] P3.5 Analyzer: reuse distance (units, bytes), exact LRU miss-ratio curve
 - [ ] P3.6 Analyzer: transitions + top-m recall, token reuse, popularity, per-layer timing
 - [ ] P3.7 `moepager synth` / `moepager analyze` CLIs
 
