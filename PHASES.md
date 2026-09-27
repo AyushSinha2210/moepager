@@ -8,12 +8,17 @@ where useful.
 ## Current status
 
 Phase 0 (idea review) done: **verdict KEEP, MODIFIED** (see IDEA_REVIEW.md).
-Building the offline toolchain (phases 1–6), which is roughly the first half
-of the project.
+Phases 2–4 done:
+- GGUF expert map, verified on real Qwen3/gpt-oss/OLMoE headers;
+- trace format, synthetic generator and analyzer;
+- mp-core policy code and the simulator with Belady*.
+
+Simulated LRU agrees exactly with the analyzer's LRU curve. Working on
+phase 5 (OS layer, recorder, daemon skeleton).
 
 ## Next up
 
-- P1: repository scaffold.
+- P5.1–P5.2: mp-os traits, MockOps, Linux probes and actuators.
 
 ## Phases
 
@@ -57,7 +62,7 @@ of the project.
 - [x] P4.4 Simulator engine: byte-capacity cache, FIFO I/O channel, stall accounting
 - [x] P4.5 Policies: LRU, LFU, prefix-pin, static-freq oracle, V-residency, V+prefetch, Belady*
 - [x] P4.6 Cross-check: simulated LRU == analyzer MRC
-- [ ] P4.7 `moepager sim` CLI: policy × budget sweep → CSV/markdown table
+- [x] P4.7 `moepager sim` CLI: policy × budget sweep → CSV/markdown table
 
 ### Phase 5 — Recorder and daemon skeleton
 - [ ] P5.1 mp-os traits + MockOps
@@ -109,6 +114,12 @@ of the project.
 - Repack default: llama.cpp on AVX2 repacks Q4_0/Q4_K/IQ4_NL/MXFP4 into
   anonymous memory. moepager needs `--no-repack`. Verified from source only,
   not yet measured.
+
+- Prediction prefetch derives its deadline budget from the *observed* layer
+  time. Under I/O stalls that estimate includes stall time, so the budget
+  inflates and prefetch competes with demand misses. On synthetic traces this
+  wastes ≈0.4 GB/token. The daemon only sees wall time, so a fix needs a
+  compute-time estimate (e.g. the minimum gap over recent tokens). Open.
 
 ## Decision log
 

@@ -4,6 +4,7 @@ use anyhow::Result;
 use clap::{Parser, Subcommand};
 
 mod cmd_gguf;
+mod cmd_sim;
 mod cmd_trace;
 mod common;
 
@@ -26,6 +27,8 @@ enum Cmd {
     Synth(cmd_trace::SynthArgs),
     /// Analyze an expert trace: reuse distance, LRU curve, routing stats, timing.
     Analyze(cmd_trace::AnalyzeArgs),
+    /// Simulate page-cache policies (incl. Belady oracle) over an expert trace.
+    Sim(cmd_sim::Args),
     /// Print a trace as CSV.
     TraceCsv(cmd_trace::CsvArgs),
 }
@@ -36,5 +39,6 @@ fn main() -> Result<()> {
         Cmd::Synth(a) => cmd_trace::synth(a),
         Cmd::Analyze(a) => cmd_trace::analyze(a),
         Cmd::TraceCsv(a) => cmd_trace::csv(a),
+        Cmd::Sim(a) => cmd_sim::run(a),
     }
 }

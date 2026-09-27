@@ -23,7 +23,9 @@ pub struct Args {
 
 pub fn run(a: Args) -> Result<()> {
     let h = parse_file(&a.gguf).with_context(|| format!("parsing {}", a.gguf.display()))?;
-    let size = a.file_size.or_else(|| std::fs::metadata(&a.gguf).ok().map(|m| m.len()));
+    let size = a
+        .file_size
+        .or_else(|| std::fs::metadata(&a.gguf).ok().map(|m| m.len()));
     let map = ExpertMap::from_header(&h, a.page_size, size);
     println!("{}", map.summary());
     for w in &map.warnings {
@@ -44,9 +46,18 @@ pub fn run(a: Args) -> Result<()> {
     }
     if a.verbose {
         for u in &map.units {
-            let s: Vec<String> =
-                u.slices.iter().map(|s| format!("{}@{}+{}", s.kind, s.offset, s.len)).collect();
-            println!("L{:>3} E{:>4} {:>10}B {}", u.layer, u.expert, u.bytes, s.join(" "));
+            let s: Vec<String> = u
+                .slices
+                .iter()
+                .map(|s| format!("{}@{}+{}", s.kind, s.offset, s.len))
+                .collect();
+            println!(
+                "L{:>3} E{:>4} {:>10}B {}",
+                u.layer,
+                u.expert,
+                u.bytes,
+                s.join(" ")
+            );
         }
     }
     if let Some(out) = a.out {
