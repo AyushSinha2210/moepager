@@ -65,7 +65,7 @@ phase 5 (OS layer, recorder, daemon skeleton).
 - [x] P4.7 `moepager sim` CLI: policy × budget sweep → CSV/markdown table
 
 ### Phase 5 — Recorder and daemon skeleton
-- [ ] P5.1 mp-os traits + MockOps
+- [x] P5.1 mp-os traits + MockOps
 - [ ] P5.2 Linux probes: mincore, cachestat; Linux ops: fadvise, mlock, process_madvise, /proc/pid/maps lookup
 - [ ] P5.3 Full-scan mincore diff recorder (page trace)
 - [ ] P5.4 Sentinel recorder (expert trace, miss-only)
