@@ -120,9 +120,14 @@ impl Belady {
         }
     }
 
-    fn next_use(&self, u: u32, pos: usize) -> usize {
+    /// First use at or after `pos` (`inclusive`) or strictly after it.
+    fn next_use(&self, u: u32, pos: usize, inclusive: bool) -> usize {
         let o = &self.occ[u as usize];
-        let i = o.partition_point(|&p| p <= pos);
+        let i = if inclusive {
+            o.partition_point(|&p| p < pos)
+        } else {
+            o.partition_point(|&p| p <= pos)
+        };
         o.get(i).copied().unwrap_or(usize::MAX)
     }
 }
@@ -132,12 +137,9 @@ impl Evictor for Belady {
         "belady*"
     }
     fn insert(&mut self, u: u32, pos: usize, accessed: bool) {
-        // A prefetch at `pos` precedes the access at `pos` itself.
-        let k = if accessed {
-            self.next_use(u, pos)
-        } else {
-            self.next_use(u, pos.wrapping_sub(1))
-        };
+        // A demand access at `pos` is itself the current use; a prefetch or
+        // unpin at `pos` happens before the access at `pos`.
+        let k = self.next_use(u, pos, !accessed);
         self.key[u as usize] = k;
         self.set.insert((k, u));
     }
@@ -190,5 +192,19 @@ mod tests {
         e.insert(2, 2, true); // never used again
         assert_eq!(e.victim(), Some(2));
         assert_eq!(e.victim(), Some(1)); // next at 4, vs 0 at 3
+    }
+}
+
+#[cfg(test)]
+mod belady_prefetch {
+    use super::*;
+
+    #[test]
+    fn prefetch_at_zero_sees_first_use() {
+        let seq = [5u32, 0, 1];
+        let mut e = Belady::new(6, &seq);
+        e.insert(5, 0, false); // used at 0
+        e.insert(1, 0, false); // used at 2
+        assert_eq!(e.victim(), Some(1));
     }
 }
