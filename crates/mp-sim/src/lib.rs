@@ -1,5 +1,6 @@
 //! Trace-driven simulator of the page cache at expert-unit granularity.
 
+pub mod control;
 pub mod engine;
 pub mod evict;
 
