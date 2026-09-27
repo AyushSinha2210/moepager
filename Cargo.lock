@@ -206,8 +206,11 @@ name = "mp-recorder"
 version = "0.1.0"
 dependencies = [
  "anyhow",
+ "libc",
+ "mp-core",
  "mp-gguf",
  "mp-os",
+ "mp-synth",
  "mp-trace",
  "serde_json",
 ]

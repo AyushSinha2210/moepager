@@ -67,7 +67,7 @@ phase 5 (OS layer, recorder, daemon skeleton).
 ### Phase 5 — Recorder and daemon skeleton
 - [x] P5.1 mp-os traits + MockOps
 - [x] P5.2 Linux probes: mincore, cachestat; Linux ops: fadvise, mlock, process_madvise, /proc/pid/maps lookup
-- [ ] P5.3 Full-scan mincore diff recorder (page trace)
+- [x] P5.3 Full-scan mincore diff recorder (page trace)
 - [ ] P5.4 Sentinel recorder (expert trace, miss-only)
 - [ ] P5.5 page→expert conversion; bpftrace script + ingest
 - [ ] P5.6 moepagerd: config, event loop, dry-run on traces with MockOps

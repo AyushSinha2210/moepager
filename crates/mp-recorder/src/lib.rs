@@ -1,1 +1,4 @@
-//! Black-box page-cache recorders and trace converters
+//! Black-box recorders (page-cache observation without touching the
+//! engine), converters, and a trace replayer for real-kernel experiments.
+
+pub mod scan;
