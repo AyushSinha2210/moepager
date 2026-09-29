@@ -2,8 +2,10 @@
 
 use serde::{Deserialize, Serialize};
 
-/// Bandwidths in bytes/s, latencies in ns. Defaults are placeholders until
-/// `moepager fault-io` measures the target machine (BENCHMARKS.md, Exp. C).
+/// Bandwidths in bytes/s (of *touched* bytes, so read amplification is
+/// folded in), latencies in ns. Bandwidth defaults are the dev laptop's
+/// `moepager fault-io` smoke results (BENCHMARKS.md, Exp. C: ≈0.45 GB/s
+/// fault-driven, ≈2.0 GB/s bulk). Re-measure on each target machine.
 #[derive(Debug, Clone, Copy, PartialEq, Serialize, Deserialize)]
 #[serde(default)]
 pub struct CostModel {
@@ -21,8 +23,8 @@ impl Default for CostModel {
     fn default() -> Self {
         CostModel {
             t_fault_ns: 100_000.0,
-            demand_bw: 1.0e9,
-            bulk_bw: 3.0e9,
+            demand_bw: 0.45e9,
+            bulk_bw: 2.0e9,
             detect_ns: 200_000.0,
         }
     }

@@ -26,9 +26,11 @@ pub struct Args {
     /// Expert-completion readahead: off, on or both.
     #[arg(long, default_value = "both")]
     pub completion: String,
-    #[arg(long, default_value_t = 1.0)]
+    /// Fault-driven bandwidth of touched bytes (default: dev-laptop smoke result).
+    #[arg(long, default_value_t = 0.45)]
     pub demand_gbps: f64,
-    #[arg(long, default_value_t = 3.0)]
+    /// Bulk (WILLNEED) bandwidth (default: dev-laptop smoke result).
+    #[arg(long, default_value_t = 2.0)]
     pub bulk_gbps: f64,
     #[arg(long, default_value_t = 100.0)]
     pub t_fault_us: f64,
