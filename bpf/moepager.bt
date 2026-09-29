@@ -1,0 +1,26 @@
+#!/usr/bin/env bpftrace
+/*
+ * Record page-cache insertions/deletions for one file (the model).
+ * UNTESTED-ON-HW: needs root (or CAP_BPF + CAP_PERFMON) and bpftrace.
+ *
+ * Usage: sudo bpftrace bpf/moepager.bt <inode> <kdev> > model.bt.txt
+ *   <kdev> is the *kernel* device, MKDEV(major, minor) = major << 20 | minor,
+ *   taken from /proc/self/maps of a process mapping the file — on btrfs this
+ *   differs from stat(1)'s device. `moepager record --print-bpftrace-args`
+ *   prints both values.
+ * Then: moepager ingest-bpftrace model.bt.txt --gguf model.gguf -o pages.mpt
+ *
+ * Output lines: A|D <t_ns> <ino> <page index> <folio order>
+ * (`order` needs Linux >= 6.x; on older kernels replace args->order with 0.)
+ */
+tracepoint:filemap:mm_filemap_add_to_page_cache
+/args->i_ino == $1 && args->s_dev == $2/
+{
+	printf("A %llu %llu %lu %u\n", nsecs, args->i_ino, args->index, args->order);
+}
+
+tracepoint:filemap:mm_filemap_delete_from_page_cache
+/args->i_ino == $1 && args->s_dev == $2/
+{
+	printf("D %llu %llu %lu %u\n", nsecs, args->i_ino, args->index, args->order);
+}
