@@ -75,9 +75,28 @@ kernel 6.19). There is a 30 s idle period before the run.
 
 ### Microbenchmark: fault-driven vs bulk read bandwidth (Experiment C)
 
-| machine | unit size | threads | mmap-fault GB/s | WILLNEED GB/s | pread 1 MiB GB/s | notes |
-|---|---|---|---|---|---|---|
-| L1 | TBD | TBD | TBD | TBD | TBD | TBD |
+Smoke runs only. A full run (Experiment C, P7.5) is still to do. Raw
+output: `bench/results/L1-faultio-smoke.txt`. Setup:
+- `moepager fault-io` over a 1 GiB incompressible file on btrfs
+  (`compress=zstd:1`, bdi `read_ahead_kb = 4096`);
+- random expert units, each split into 3 slices in different thirds of the
+  file;
+- 6 touching threads, desktop session running.
+
+"Amp" is storage bytes read (`/proc/self/io read_bytes`) divided by bytes
+touched.
+
+| machine | unit size | units × runs | mmap-fault GB/s (amp) | WILLNEED-then-touch GB/s (amp) | pread 1 MiB GB/s (amp) |
+|---|---|---|---|---|---|
+| L1 | 2.86 MB (Qwen3-30B-A3B-like) | 48 × 4 | 0.41–0.52 (3.3–3.6×) | 1.75–2.07 (1.00×) | 0.86–0.93 (1.05–1.10×) |
+| L1 | 13.25 MB (gpt-oss-20b-like) | 16 × 2 | 0.89 (2.2×) | 1.98–2.03 (1.4×) | 1.01–1.02 (2.2×) |
+
+Caveats:
+- The touch pattern (64 KiB chunks interleaved across threads)
+  approximates, but is not, ggml's row split.
+- Neighbouring data pulled in by read-around is counted as waste. In a
+  real model it is other experts, which may be used later.
+- The numbers are from one machine and one filesystem.
 
 ### Simulator vs kernel validation (Experiment B)
 
