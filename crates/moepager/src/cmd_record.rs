@@ -82,7 +82,7 @@ pub fn record(a: RecordArgs) -> Result<()> {
                 ev.extend(rec.tick(&probe, t0.elapsed().as_nanos() as u64)?);
                 std::thread::sleep(interval);
             }
-            let slack = (map.n_layers / 8).max(1) as u16;
+            let slack = (map.n_layers / 8) as u16;
             let n = infer_tokens(&mut ev, slack);
             let h = header("sentinel", &map, &a.gguf, Observation::MissOnly);
             mp_trace::write_expert_file(&out, &h, &ev)?;
@@ -164,7 +164,7 @@ pub fn page2expert(a: Page2ExpertArgs) -> Result<()> {
         ..Default::default()
     };
     let mut ev = page_to_expert(&pages, &map, &cfg);
-    let n = infer_tokens(&mut ev, (map.n_layers / 8).max(1) as u16);
+    let n = infer_tokens(&mut ev, (map.n_layers / 8) as u16);
     let mut h = header(&ph.source, &map, &a.gguf, Observation::MissOnly);
     h.params = serde_json::json!({ "converted_from": a.pages.display().to_string() });
     mp_trace::write_expert_file(&a.out, &h, &ev)?;
