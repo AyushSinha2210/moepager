@@ -3,5 +3,11 @@
 
 pub mod bpftrace;
 pub mod convert;
+pub mod replay;
 pub mod scan;
 pub mod sentinel;
+
+pub use convert::{page_to_expert, ConvertConfig};
+pub use replay::{replay, ReplayConfig, ReplayStats, TouchMode};
+pub use scan::ScanRecorder;
+pub use sentinel::SentinelRecorder;
