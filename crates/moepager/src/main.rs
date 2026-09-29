@@ -3,6 +3,7 @@
 use anyhow::Result;
 use clap::{Parser, Subcommand};
 
+mod cmd_faultio;
 mod cmd_gguf;
 mod cmd_sim;
 mod cmd_trace;
@@ -29,6 +30,8 @@ enum Cmd {
     Analyze(cmd_trace::AnalyzeArgs),
     /// Simulate page-cache policies (incl. Belady oracle) over an expert trace.
     Sim(cmd_sim::Args),
+    /// Microbenchmark: fault-driven vs bulk read bandwidth for expert units (Experiment C).
+    FaultIo(cmd_faultio::Args),
     /// Print a trace as CSV.
     TraceCsv(cmd_trace::CsvArgs),
 }
@@ -40,5 +43,6 @@ fn main() -> Result<()> {
         Cmd::Analyze(a) => cmd_trace::analyze(a),
         Cmd::TraceCsv(a) => cmd_trace::csv(a),
         Cmd::Sim(a) => cmd_sim::run(a),
+        Cmd::FaultIo(a) => cmd_faultio::run(a),
     }
 }
