@@ -129,6 +129,21 @@ phase 5 (OS layer, recorder, daemon skeleton).
 - `process_madvise(MADV_COLD)` demotion is implemented but untested: it
   needs `CAP_SYS_NICE` and a running engine.
 
+- **btrfs readahead is 4 MiB** (`/sys/class/bdi/btrfs-1/read_ahead_kb =
+  4096` on the dev laptop, versus 128 KiB for the NVMe block device).
+  Sequential reads of one expert pull neighbouring experts' interiors into
+  the cache. This causes false positives for miss-based expert inference.
+  It may also mean mmap read-around on btrfs amplifies llama.cpp's expert
+  reads far beyond the 128 KiB assumed in IDEA_REVIEW §1.2. Measure with
+  `moepager fault-io` (bytes read vs touched) in Experiment C. The e2e
+  recorder tests disable readahead (`POSIX_FADV_RANDOM`) to test recorder
+  logic in isolation.
+- btrfs `compress=zstd` reads whole 128 KiB compressed extents. Measured:
+  reading a 544 KiB slice inserted 17 pages of the neighbouring expert.
+  Page→expert conversion ignores pages within 128 KiB of slice edges.
+- Sentinel and scan recorders are tested only against the replayer
+  (pread, readahead off, cache dropped per token), not against llama.cpp.
+
 ## Decision log
 
 | date | decision | why |
