@@ -68,7 +68,7 @@ phase 5 (OS layer, recorder, daemon skeleton).
 - [x] P5.1 mp-os traits + MockOps
 - [x] P5.2 Linux probes: mincore, cachestat; Linux ops: fadvise, mlock, process_madvise, /proc/pid/maps lookup
 - [x] P5.3 Full-scan mincore diff recorder (page trace)
-- [ ] P5.4 Sentinel recorder (expert trace, miss-only)
+- [x] P5.4 Sentinel recorder (expert trace, miss-only)
 - [ ] P5.5 page→expert conversion; bpftrace script + ingest
 - [ ] P5.6 moepagerd: config, event loop, dry-run on traces with MockOps
 - [ ] P5.7 moepagerd: live mode wiring (sentinel source + LinuxOps) — untested on real engine
