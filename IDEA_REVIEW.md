@@ -64,9 +64,9 @@ using HTTP range requests.
   3-D `src0`. Repacked tensors are copied into a separate CPU_REPACK buffer of
   **anonymous memory**. The mmap'd file pages are touched once at load time
   and never again. Consequences:
-  - Qwen3-30B-A3B Q4_K_M: up/gate experts (Q4_K, about 2/3 of the expert
-    bytes) become anonymous memory; down experts that are Q6_K stay
-    file-backed.
+  - Qwen3-30B-A3B Q4_K_M: every Q4_K expert tensor is repacked, which is
+    **77 % of expert bytes** (`moepager gguf-map` on the real header, AVX2
+    host). Only the Q6_K down tensors stay file-backed.
   - gpt-oss-20b MXFP4: all expert weights become anonymous memory.
   - Under memory pressure these pages go to **swap or zram, not the page
     cache**. A page-cache daemon has nothing to manage there.
@@ -79,12 +79,19 @@ using HTTP range requests.
     without repack. 🔬 The magnitude is unmeasured. A third-party report
     (llama-cpp-expert-sniper) independently notes that "CPU_REPACK doubles
     memory use".
-- ⚠️ A fault on a missing page runs synchronous mmap read-around
-  (`read_ahead_kb`, 128 KB on this NVMe). Six to eight compute threads fault
-  different rows of the same expert concurrently. So a cold 2.9 MB expert
-  arrives as a burst of roughly 23+ 128 KB reads at modest queue depth, not
-  as one large read. 🔬 Effective bandwidth under that pattern versus
-  bulk readahead is unmeasured, and it is now the central question (§4).
+- ⚠️ A fault on a missing page runs synchronous mmap read-around sized by
+  the backing device's readahead. **On this laptop's btrfs that is 4 MiB**
+  (`/sys/class/bdi/btrfs-1/read_ahead_kb`), not the NVMe block device's
+  128 KiB. Six to eight compute threads fault different rows of the same
+  expert concurrently.
+  ✅ **Measured (smoke run, `moepager fault-io`, BENCHMARKS.md
+  Experiment C):** cold 2.86 MB expert units faulted through mmap arrive
+  at **0.41–0.52 GB/s with 3.3–3.6× read amplification**. Issuing one
+  `WILLNEED` per slice first gives **1.75–2.07 GB/s with 1.00×
+  amplification**. For 13.25 MB (gpt-oss-sized) units: 0.89 vs ≈2.0 GB/s.
+  The bandwidth lever (§4) is therefore real on this machine, roughly 4×
+  for Qwen3-sized experts. Still to show: whether it survives llama.cpp's
+  actual access pattern (P7.5/P7.6).
 - ✅ Up, gate and down of the same expert sit in different tensors, so
   kernel readahead can never fetch "the rest of the expert". The kernel has
   no way to know the three ranges belong together. Only a structure-aware
@@ -318,7 +325,9 @@ needs. Nothing built now is wasted if the kill criteria fire.
   bytes at C ∈ [15 %, 50 %] on ≥ 2 of 3 models. Prediction and residency
   then can't buy ≥ 15 %.
 - **K2, no bandwidth gap:** fault-driven effective bandwidth ≥ 0.75 × bulk
-  `WILLNEED` bandwidth (C).
+  `WILLNEED` bandwidth (C). *Smoke result on L1: 0.41–0.52 vs 1.75–2.07
+  GB/s, i.e. ≈ 0.25×, so K2 does not fire on this machine. The full run
+  is pending.*
 - **K1 and K2 both hold → kill the daemon.** Publish the measurement study
   instead.
 - **Only K1** → shrink to an expert-completion readahead helper.
