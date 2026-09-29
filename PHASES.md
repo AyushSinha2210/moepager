@@ -71,7 +71,7 @@ phase 5 (OS layer, recorder, daemon skeleton).
 - [x] P5.4 Sentinel recorder (expert trace, miss-only)
 - [x] P5.5 page→expert conversion; bpftrace script + ingest
 - [x] P5.6 moepagerd: config, event loop, dry-run on traces with MockOps
-- [ ] P5.7 moepagerd: live mode wiring (sentinel source + LinuxOps) — untested on real engine
+- [x] P5.7 moepagerd: live mode wiring (sentinel source + LinuxOps) — untested on real engine
 
 ### Phase 6 — Benchmark harness
 - [x] P6.1 `moepager replay` (mmap replay of an expert trace on a real file) + `moepager fault-io` microbench
