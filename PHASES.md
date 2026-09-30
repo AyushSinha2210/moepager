@@ -144,13 +144,19 @@ phase 5 (OS layer, recorder, daemon skeleton).
 - Sentinel and scan recorders are tested only against the replayer
   (pread, readahead off, cache dropped per token), not against llama.cpp.
 
-- `posix_fadvise(WILLNEED)` had **no effect at all** on the GitHub Actions
-  runner (0 pages populated in 10 s), although it works on the dev laptop.
-  Likely cause: readahead disabled on that device (the kernel skips WILLNEED
-  when `ra_pages == 0`). Unconfirmed. The mp-os tests skip in that case.
-  For the product, completion readahead needs a fallback that doesn't depend
-  on readahead settings: `MADV_POPULATE_READ` (5.14+) on the daemon's own
-  mapping from a worker thread, which is synchronous. Not implemented yet.
+- **Single `WILLNEED` calls are silently truncated** to
+  `max(bdi->io_pages, ra->ra_pages)`. Source: `force_page_cache_ra()` in
+  mm/readahead.c. Observed on the GitHub runner: exactly 64 pages (256 KiB)
+  populated for a 1 MiB request. The first CI failure was misread as "no
+  effect"; it was this truncation.
+  - **Fix:** `LinuxOps::prefetch` and `fault-io` issue 128 KiB chunks
+    (`mp_os::WILLNEED_CHUNK`).
+  - The dev laptop hid the bug because btrfs's bdi readahead is 4 MiB.
+  - Prior negative WILLNEED results (RELATED_WORK) may or may not have been
+    affected; worth checking when comparing.
+  - The tests still skip if WILLNEED populates nothing at all. A
+    readahead-independent fallback (`MADV_POPULATE_READ` from a worker
+    thread) remains future work.
 
 ## Decision log
 
@@ -159,3 +165,6 @@ phase 5 (OS layer, recorder, daemon skeleton).
 | 2026-09-24 | Keep the idea, modified (IDEA_REVIEW §7) | OS-level black-box niche is unoccupied. Assumptions corrected (repack, DONTNEED, hits invisible) |
 | 2026-09-24 | Gate the daemon behind a go/no-go (K1–K4) | Prior evidence (arXiv 2608.12103) says prediction prefetch and fancy residency win less than intuition suggests |
 | 2026-09-24 | Rust core + Python tooling, dual MIT/Apache-2.0 | Shared policy code between simulator and daemon. Python fixture writer is an independent check |
+| 2026-09-29 | Prefetch reframed around expert-completion readahead; prediction prefetch kept behind a flag | fault-io smoke run: ≈4× bandwidth gap between mmap faults and bulk WILLNEED. Simulator: prediction wastes ≈0.4 GB/token on synthetic traces |
+| 2026-09-29 | Simulator cost defaults = measured dev-laptop numbers (0.45 / 2.0 GB/s) | Replace guessed 1 / 3 GB/s with measurements; re-measure per machine |
+| 2026-09-30 | Chunk WILLNEED into 128 KiB requests | The kernel truncates each WILLNEED to the device readahead size (found via CI) |

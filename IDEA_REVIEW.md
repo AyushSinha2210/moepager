@@ -149,6 +149,13 @@ using HTTP range requests.
 - ✅ `posix_fadvise(WILLNEED)` and `readahead(2)` on the file populate the
   **shared** page cache and need no privilege. llama.cpp then takes a minor
   fault instead of a major one.
+- ⚠️ **But each WILLNEED call is silently truncated** to
+  `max(bdi->io_pages, ra->ra_pages)` (`force_page_cache_ra()`). On a typical
+  128 KiB-readahead NVMe, a WILLNEED covering a 0.9 MB expert slice reads
+  only its first 128 KiB. Found when CI populated exactly 256 KiB of a
+  1 MiB request. moepager splits requests into 128 KiB chunks. Any
+  comparison with prior "WILLNEED barely helps" results should check
+  whether they hit this truncation.
 - ✅ `mlock` of a page through the daemon's own mapping makes the shared
   folio unevictable for everyone. ⚠️ `RLIMIT_MEMLOCK` here is **8 MB**, so a
   multi-GB pin budget needs `CAP_IPC_LOCK` or a raised limit.
