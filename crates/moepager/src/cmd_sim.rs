@@ -30,7 +30,7 @@ pub struct Args {
     #[arg(long, default_value_t = 0.45)]
     pub demand_gbps: f64,
     /// Bulk (WILLNEED) bandwidth (default: dev-laptop smoke result).
-    #[arg(long, default_value_t = 2.0)]
+    #[arg(long, default_value_t = 2.4)]
     pub bulk_gbps: f64,
     #[arg(long, default_value_t = 100.0)]
     pub t_fault_us: f64,
