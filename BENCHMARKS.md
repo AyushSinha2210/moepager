@@ -81,15 +81,18 @@ output: `bench/results/L1-faultio-smoke.txt`. Setup:
   (`compress=zstd:1`, bdi `read_ahead_kb = 4096`);
 - random expert units, each split into 3 slices in different thirds of the
   file;
-- 6 touching threads, desktop session running.
+- 6 touching threads, desktop session running;
+- WILLNEED issued per slice, either in 128 KiB chunks (what moepager does)
+  or as one call, which the kernel truncates to the device's readahead
+  size (IDEA_REVIEW §1.4).
 
 "Amp" is storage bytes read (`/proc/self/io read_bytes`) divided by bytes
 touched.
 
-| machine | unit size | units × runs | mmap-fault GB/s (amp) | WILLNEED-then-touch GB/s (amp) | pread 1 MiB GB/s (amp) |
-|---|---|---|---|---|---|
-| L1 | 2.86 MB (Qwen3-30B-A3B-like) | 48 × 4 | 0.41–0.52 (3.3–3.6×) | 1.75–2.07 (1.00×) | 0.86–0.93 (1.05–1.10×) |
-| L1 | 13.25 MB (gpt-oss-20b-like) | 16 × 2 | 0.89 (2.2×) | 1.98–2.03 (1.4×) | 1.01–1.02 (2.2×) |
+| machine | unit size | units × runs | mmap-fault GB/s (amp) | WILLNEED 128 KiB chunks GB/s (amp) | WILLNEED one call/slice GB/s (amp) | pread 1 MiB GB/s (amp) |
+|---|---|---|---|---|---|---|
+| L1 | 2.86 MB (Qwen3-30B-A3B-like) | 48 × 6 | 0.44–0.49 (3.3–3.7×) | 2.37–2.46 (1.00×) | 2.00–2.10 (1.00×) | 0.79–0.92 (1.05–1.10×) |
+| L1 | 13.25 MB (gpt-oss-20b-like) | 16 × 2 | 0.76–0.87 (2.3×) | 3.09 (1.00×) | 1.92 (1.45×; 4.4 MB slices exceed the 4 MiB WILLNEED cap) | 0.99–1.00 (2.2×) |
 
 Caveats:
 - The touch pattern (64 KiB chunks interleaved across threads)

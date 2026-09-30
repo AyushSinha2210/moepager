@@ -86,11 +86,11 @@ using HTTP range requests.
   expert concurrently.
   ✅ **Measured (smoke run, `moepager fault-io`, BENCHMARKS.md
   Experiment C):** cold 2.86 MB expert units faulted through mmap arrive
-  at **0.41–0.52 GB/s with 3.3–3.6× read amplification**. Issuing one
-  `WILLNEED` per slice first gives **1.75–2.07 GB/s with 1.00×
-  amplification**. For 13.25 MB (gpt-oss-sized) units: 0.89 vs ≈2.0 GB/s.
-  The bandwidth lever (§4) is therefore real on this machine, roughly 4×
-  for Qwen3-sized experts. Still to show: whether it survives llama.cpp's
+  at **0.41–0.52 GB/s with 3.3–3.7× read amplification**. Issuing
+  `WILLNEED` for each slice first, in 128 KiB chunks, gives **2.37–2.46 GB/s
+  with 1.00× amplification**. For 13.25 MB (gpt-oss-sized) units: 0.76–0.89
+  vs 3.09 GB/s. The bandwidth lever (§4) is therefore real on this
+  machine, roughly 5× for Qwen3-sized experts. Still to show: whether it survives llama.cpp's
   actual access pattern (P7.5/P7.6).
 - ✅ Up, gate and down of the same expert sit in different tensors, so
   kernel readahead can never fetch "the rest of the expert". The kernel has
@@ -332,8 +332,8 @@ needs. Nothing built now is wasted if the kill criteria fire.
   bytes at C ∈ [15 %, 50 %] on ≥ 2 of 3 models. Prediction and residency
   then can't buy ≥ 15 %.
 - **K2, no bandwidth gap:** fault-driven effective bandwidth ≥ 0.75 × bulk
-  `WILLNEED` bandwidth (C). *Smoke result on L1: 0.41–0.52 vs 1.75–2.07
-  GB/s, i.e. ≈ 0.25×, so K2 does not fire on this machine. The full run
+  `WILLNEED` bandwidth (C). *Smoke result on L1: 0.41–0.52 vs 2.37–2.46
+  GB/s, i.e. ≈ 0.2×, so K2 does not fire on this machine. The full run
   is pending.*
 - **K1 and K2 both hold → kill the daemon.** Publish the measurement study
   instead.

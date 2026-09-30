@@ -1,31 +1,59 @@
 # moepager fault-io smoke run, machine L1 (see BENCHMARKS.md)
 # kernel 6.19.14-108.fc42.x86_64; /home is btrfs (compress=zstd:1), bdi btrfs-1 read_ahead_kb=4096
-# desktop session running; MemAvailable 4265136 kB at start
-## qwen3-sized units, seed 1
+# desktop session running; MemAvailable 4086728 kB at start
+## qwen3-sized units, seed 1, willneed chunk 128 KiB (0 = one call per slice)
 file=/home/AeroChrome/.cache/moepager-probe/faultio.bin size=1.07GB units=48 unit=2.86MB slices=3 threads=6 read_ahead: see /sys/class/bdi/*/read_ahead_kb
 | mode | GB/s (touched) | ms/unit | storage read / touched |
 |---|---|---|---|
-| fault | 0.46 | 6.21 | 3.64 |
-| willneed | 1.97 | 1.45 | 1.00 |
-| pread | 0.88 | 3.23 | 1.10 |
-## qwen3-sized units, seed 2
+| fault | 0.44 | 6.43 | 3.65 |
+| willneed | 2.37 | 1.20 | 1.00 |
+| pread | 0.79 | 3.61 | 1.10 |
+## qwen3-sized units, seed 2, willneed chunk 128 KiB (0 = one call per slice)
 file=/home/AeroChrome/.cache/moepager-probe/faultio.bin size=1.07GB units=48 unit=2.86MB slices=3 threads=6 read_ahead: see /sys/class/bdi/*/read_ahead_kb
 | mode | GB/s (touched) | ms/unit | storage read / touched |
 |---|---|---|---|
-| fault | 0.52 | 5.46 | 3.25 |
-| willneed | 2.07 | 1.38 | 1.00 |
-| pread | 0.92 | 3.09 | 1.06 |
-## qwen3-sized units, seed 3
+| fault | 0.47 | 6.03 | 3.26 |
+| willneed | 2.43 | 1.18 | 1.00 |
+| pread | 0.92 | 3.11 | 1.06 |
+## qwen3-sized units, seed 3, willneed chunk 128 KiB (0 = one call per slice)
 file=/home/AeroChrome/.cache/moepager-probe/faultio.bin size=1.07GB units=48 unit=2.86MB slices=3 threads=6 read_ahead: see /sys/class/bdi/*/read_ahead_kb
 | mode | GB/s (touched) | ms/unit | storage read / touched |
 |---|---|---|---|
-| fault | 0.44 | 6.48 | 3.48 |
-| willneed | 2.05 | 1.39 | 1.00 |
-| pread | 0.90 | 3.17 | 1.05 |
-## gpt-oss-sized units
+| fault | 0.49 | 5.81 | 3.47 |
+| willneed | 2.46 | 1.16 | 1.00 |
+| pread | 0.80 | 3.57 | 1.05 |
+## gpt-oss-sized units, willneed chunk 128 KiB
 file=/home/AeroChrome/.cache/moepager-probe/faultio.bin size=1.07GB units=16 unit=13.25MB slices=3 threads=6 read_ahead: see /sys/class/bdi/*/read_ahead_kb
 | mode | GB/s (touched) | ms/unit | storage read / touched |
 |---|---|---|---|
-| fault | 0.89 | 14.84 | 2.25 |
-| willneed | 1.98 | 6.69 | 1.45 |
-| pread | 1.01 | 13.19 | 2.20 |
+| fault | 0.76 | 17.53 | 2.35 |
+| willneed | 3.09 | 4.29 | 1.00 |
+| pread | 0.99 | 13.40 | 2.20 |
+## qwen3-sized units, seed 1, willneed chunk 0 KiB (0 = one call per slice)
+file=/home/AeroChrome/.cache/moepager-probe/faultio.bin size=1.07GB units=48 unit=2.86MB slices=3 threads=6 read_ahead: see /sys/class/bdi/*/read_ahead_kb
+| mode | GB/s (touched) | ms/unit | storage read / touched |
+|---|---|---|---|
+| fault | 0.46 | 6.17 | 3.65 |
+| willneed | 2.10 | 1.36 | 1.00 |
+| pread | 0.87 | 3.28 | 1.10 |
+## qwen3-sized units, seed 2, willneed chunk 0 KiB (0 = one call per slice)
+file=/home/AeroChrome/.cache/moepager-probe/faultio.bin size=1.07GB units=48 unit=2.86MB slices=3 threads=6 read_ahead: see /sys/class/bdi/*/read_ahead_kb
+| mode | GB/s (touched) | ms/unit | storage read / touched |
+|---|---|---|---|
+| fault | 0.49 | 5.83 | 3.26 |
+| willneed | 2.07 | 1.38 | 1.00 |
+| pread | 0.81 | 3.52 | 1.06 |
+## qwen3-sized units, seed 3, willneed chunk 0 KiB (0 = one call per slice)
+file=/home/AeroChrome/.cache/moepager-probe/faultio.bin size=1.07GB units=48 unit=2.86MB slices=3 threads=6 read_ahead: see /sys/class/bdi/*/read_ahead_kb
+| mode | GB/s (touched) | ms/unit | storage read / touched |
+|---|---|---|---|
+| fault | 0.49 | 5.83 | 3.47 |
+| willneed | 2.00 | 1.43 | 1.00 |
+| pread | 0.82 | 3.48 | 1.05 |
+## gpt-oss-sized units, willneed chunk 0 KiB
+file=/home/AeroChrome/.cache/moepager-probe/faultio.bin size=1.07GB units=16 unit=13.25MB slices=3 threads=6 read_ahead: see /sys/class/bdi/*/read_ahead_kb
+| mode | GB/s (touched) | ms/unit | storage read / touched |
+|---|---|---|---|
+| fault | 0.87 | 15.29 | 2.26 |
+| willneed | 1.92 | 6.91 | 1.45 |
+| pread | 1.00 | 13.21 | 2.20 |
