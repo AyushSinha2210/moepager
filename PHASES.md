@@ -34,7 +34,7 @@ phase 5 (OS layer, recorder, daemon skeleton).
 - [ ] P1.1 PRD, ARCHITECTURE, PHASES, BENCHMARKS, README, CONTRIBUTING, trace spec, ADRs, PRIVILEGES
 - [x] P1.2 Cargo workspace, crate skeletons, rustfmt/clippy config
 - [x] P1.3 Python package skeleton (pyproject, ruff, pytest)
-- [ ] P1.4 Makefile (`test`, `lint`, `demo`, `bench`)
+- [x] P1.4 Makefile (`test`, `lint`, `demo`, `bench`)
 - [x] P1.5 CI workflow (fmt, clippy, tests, ruff, pytest, demo smoke)
 
 ### Phase 2 — GGUF map
@@ -79,7 +79,7 @@ phase 5 (OS layer, recorder, daemon skeleton).
 - [x] P6.3 llama.cpp baseline matrix script (default, -nr, -nr+mlock where fits, -nr+naive WILLNEED, -nr+daemon policies)
 - [x] P6.4 Co-tenant probe app
 - [x] P6.5 Python metric parsers + report table, with tests
-- [ ] P6.6 `make demo`, `make bench` entry points
+- [x] P6.6 `make demo`, `make bench` entry points
 
 ### Phase 7 — Go/no-go on real hardware (NEXT after this session)
 - [ ] P7.1 Ground-truth expert trace capture tool (libllama eval callback on `ffn_moe_topk-*`), experiment-only
