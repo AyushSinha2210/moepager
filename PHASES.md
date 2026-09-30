@@ -32,10 +32,10 @@ phase 5 (OS layer, recorder, daemon skeleton).
 
 ### Phase 1 — Scaffold and docs
 - [ ] P1.1 PRD, ARCHITECTURE, PHASES, BENCHMARKS, README, CONTRIBUTING, trace spec, ADRs, PRIVILEGES
-- [ ] P1.2 Cargo workspace, crate skeletons, rustfmt/clippy config
-- [ ] P1.3 Python package skeleton (pyproject, ruff, pytest)
+- [x] P1.2 Cargo workspace, crate skeletons, rustfmt/clippy config
+- [x] P1.3 Python package skeleton (pyproject, ruff, pytest)
 - [ ] P1.4 Makefile (`test`, `lint`, `demo`, `bench`)
-- [ ] P1.5 CI workflow (fmt, clippy, tests, ruff, pytest, demo smoke)
+- [x] P1.5 CI workflow (fmt, clippy, tests, ruff, pytest, demo smoke)
 
 ### Phase 2 — GGUF map
 - [x] P2.1 ggml type table (block size, type size) incl. K-quants, IQ, MXFP4
