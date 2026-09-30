@@ -280,21 +280,46 @@ impl TargetMapping {
     }
 }
 
+/// Largest WILLNEED request issued at once. The kernel silently truncates
+/// a WILLNEED to `max(bdi->io_pages, ra->ra_pages)` pages
+/// (`force_page_cache_ra()` in mm/readahead.c): 128 KiB on a typical
+/// NVMe, 256 KiB on GitHub's runners (observed), 4 MiB on btrfs here. Larger
+/// ranges must therefore be split, or only their head is read.
+pub const WILLNEED_CHUNK: u64 = 128 << 10;
+
+/// `posix_fadvise(WILLNEED)` over a range in `chunk`-byte requests.
+pub fn willneed_chunked(fd: libc::c_int, off: u64, len: u64, chunk: u64) -> io::Result<()> {
+    let chunk = if chunk == 0 { len.max(1) } else { chunk };
+    let mut o = off;
+    while o < off + len {
+        let n = chunk.min(off + len - o);
+        fadvise(fd, o, n, libc::POSIX_FADV_WILLNEED)?;
+        o += n;
+    }
+    Ok(())
+}
+
 /// Real page-cache operations on the model file.
 pub struct LinuxOps {
     pub file: MappedFile,
     pub target: Option<TargetMapping>,
+    /// See [`WILLNEED_CHUNK`].
+    pub willneed_chunk: u64,
 }
 
 impl LinuxOps {
     pub fn new(file: MappedFile) -> Self {
-        LinuxOps { file, target: None }
+        LinuxOps {
+            file,
+            target: None,
+            willneed_chunk: WILLNEED_CHUNK,
+        }
     }
 }
 
 impl PageCacheOps for LinuxOps {
     fn prefetch(&mut self, offset: u64, len: u64) -> io::Result<()> {
-        fadvise(self.file.fd(), offset, len, libc::POSIX_FADV_WILLNEED)
+        willneed_chunked(self.file.fd(), offset, len, self.willneed_chunk)
     }
     fn pin(&mut self, offset: u64, len: u64) -> io::Result<()> {
         let (a, l) = self.file.span(offset, len)?;

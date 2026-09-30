@@ -36,6 +36,10 @@ pub struct Args {
     pub threads: usize,
     #[arg(long, default_value_t = 1)]
     pub seed: u64,
+    /// WILLNEED request size in KiB (0 = one call per slice, which the kernel
+    /// truncates to the device's readahead size; see mp_os::WILLNEED_CHUNK).
+    #[arg(long, default_value_t = 128)]
+    pub willneed_chunk_kb: u64,
     /// Modes to run (comma-separated): fault, willneed, pread.
     #[arg(long, value_delimiter = ',', default_value = "fault,willneed,pread")]
     pub modes: Vec<String>,
@@ -68,11 +72,6 @@ fn create_file(path: &str, mib: u64) -> Result<PathBuf> {
     f.flush()?;
     f.get_ref().sync_all()?;
     Ok(p)
-}
-
-fn fadvise(fd: i32, off: u64, len: u64, adv: i32) {
-    // SAFETY: plain syscall on a valid fd; failure only loses the hint.
-    unsafe { libc::posix_fadvise(fd, off as libc::off_t, len as libc::off_t, adv) };
 }
 
 /// Touch one byte per page of each range with `threads` threads, 64 KiB
@@ -187,7 +186,7 @@ pub fn run(a: Args) -> Result<()> {
             "willneed" => {
                 for u in &units {
                     for &(o, n) in u {
-                        fadvise(fd, o, n, libc::POSIX_FADV_WILLNEED);
+                        mp_os::willneed_chunked(fd, o, n, a.willneed_chunk_kb << 10)?;
                     }
                     touch(base, u, a.threads);
                 }

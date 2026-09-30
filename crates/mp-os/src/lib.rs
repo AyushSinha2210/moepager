@@ -15,7 +15,8 @@ pub mod maps;
 pub mod mock;
 
 pub use linux::{
-    cachestat, drop_file_cache, memlock_limit, CacheStat, LinuxOps, MappedFile, TargetMapping,
+    cachestat, drop_file_cache, memlock_limit, willneed_chunked, CacheStat, LinuxOps, MappedFile,
+    TargetMapping, WILLNEED_CHUNK,
 };
 pub use maps::{find_file_mapping, kernel_dev_of_mapping, parse_maps_line, MapEntry};
 pub use mock::{MockOps, OpCall};
