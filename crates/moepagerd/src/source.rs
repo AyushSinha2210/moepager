@@ -73,8 +73,26 @@ impl SentinelSource {
     }
 }
 
+static STOP: std::sync::atomic::AtomicBool = std::sync::atomic::AtomicBool::new(false);
+
+extern "C" fn on_signal(_: libc::c_int) {
+    STOP.store(true, std::sync::atomic::Ordering::Relaxed);
+}
+
+/// Make SIGINT/SIGTERM end live sources gracefully (counters still get written).
+pub fn install_stop_handler() {
+    // SAFETY: the handler only stores to an atomic, which is async-signal-safe.
+    unsafe {
+        libc::signal(libc::SIGINT, on_signal as *const () as libc::sighandler_t);
+        libc::signal(libc::SIGTERM, on_signal as *const () as libc::sighandler_t);
+    }
+}
+
 impl EventSource for SentinelSource {
     fn poll(&mut self) -> io::Result<Option<Vec<ExpertEvent>>> {
+        if STOP.load(std::sync::atomic::Ordering::Relaxed) {
+            return Ok(None);
+        }
         if self.until.is_some_and(|u| Instant::now() >= u) {
             return Ok(None);
         }

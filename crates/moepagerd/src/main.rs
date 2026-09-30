@@ -9,7 +9,7 @@ use std::time::Duration;
 
 use anyhow::{bail, Context, Result};
 use clap::Parser;
-use moepagerd::source::{EventSource, SentinelSource, TraceSource};
+use moepagerd::source::{install_stop_handler, EventSource, SentinelSource, TraceSource};
 use moepagerd::{Daemon, DaemonConfig, Policy};
 use mp_gguf::{parse_file, ExpertMap};
 use mp_os::{
@@ -68,6 +68,7 @@ fn run<O: PageCacheOps>(
 
 fn main() -> Result<()> {
     let a = Args::parse();
+    install_stop_handler();
     let h = parse_file(&a.gguf).with_context(|| format!("parsing {}", a.gguf.display()))?;
     let map = ExpertMap::from_header(&h, 4096, std::fs::metadata(&a.gguf).ok().map(|m| m.len()));
     if map.units.is_empty() {
