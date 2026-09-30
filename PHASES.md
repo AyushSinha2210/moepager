@@ -144,6 +144,14 @@ phase 5 (OS layer, recorder, daemon skeleton).
 - Sentinel and scan recorders are tested only against the replayer
   (pread, readahead off, cache dropped per token), not against llama.cpp.
 
+- `posix_fadvise(WILLNEED)` had **no effect at all** on the GitHub Actions
+  runner (0 pages populated in 10 s), although it works on the dev laptop.
+  Likely cause: readahead disabled on that device (the kernel skips WILLNEED
+  when `ra_pages == 0`). Unconfirmed. The mp-os tests skip in that case.
+  For the product, completion readahead needs a fallback that doesn't depend
+  on readahead settings: `MADV_POPULATE_READ` (5.14+) on the daemon's own
+  mapping from a worker thread, which is synchronous. Not implemented yet.
+
 ## Decision log
 
 | date | decision | why |
