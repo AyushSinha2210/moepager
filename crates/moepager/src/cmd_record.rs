@@ -194,6 +194,13 @@ pub struct ReplayArgs {
     pub cold: bool,
     #[arg(long)]
     pub no_readahead: bool,
+    /// Evict the file's unmapped pages after every token (pread mode), so
+    /// every expert use is a miss a black-box recorder can see.
+    #[arg(long)]
+    pub drop_each_token: bool,
+    /// Idle time at the start of each token.
+    #[arg(long, default_value_t = 0.0)]
+    pub token_gap_us: f64,
     #[arg(long)]
     pub json: Option<PathBuf>,
 }
@@ -224,7 +231,8 @@ pub fn replay(a: ReplayArgs) -> Result<()> {
         t_layer: Duration::from_secs_f64(a.t_layer_us / 1e6),
         max_tokens: a.max_tokens,
         no_readahead: a.no_readahead,
-        ..Default::default()
+        drop_each_token: a.drop_each_token,
+        t_token_gap: Duration::from_secs_f64(a.token_gap_us / 1e6),
     };
     let io0 = crate::cmd_faultio::proc_read_bytes();
     let s = mp_recorder::replay(&a.gguf, &map, &steps, &cfg, |_| {})?;
