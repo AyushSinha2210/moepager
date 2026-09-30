@@ -78,7 +78,7 @@ phase 5 (OS layer, recorder, daemon skeleton).
 - [x] P6.2 cgroup v2 runner (`systemd-run --user`, memory.max) and metric snapshots (vmstat, diskstats, PSI, memory.stat)
 - [x] P6.3 llama.cpp baseline matrix script (default, -nr, -nr+mlock where fits, -nr+naive WILLNEED, -nr+daemon policies)
 - [x] P6.4 Co-tenant probe app
-- [ ] P6.5 Python metric parsers + report table, with tests
+- [x] P6.5 Python metric parsers + report table, with tests
 - [ ] P6.6 `make demo`, `make bench` entry points
 
 ### Phase 7 — Go/no-go on real hardware (NEXT after this session)
