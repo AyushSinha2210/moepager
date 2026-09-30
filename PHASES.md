@@ -76,7 +76,7 @@ phase 5 (OS layer, recorder, daemon skeleton).
 ### Phase 6 — Benchmark harness
 - [x] P6.1 `moepager replay` (mmap replay of an expert trace on a real file) + `moepager fault-io` microbench
 - [x] P6.2 cgroup v2 runner (`systemd-run --user`, memory.max) and metric snapshots (vmstat, diskstats, PSI, memory.stat)
-- [ ] P6.3 llama.cpp baseline matrix script (default, -nr, -nr+mlock where fits, -nr+naive WILLNEED, -nr+daemon policies)
+- [x] P6.3 llama.cpp baseline matrix script (default, -nr, -nr+mlock where fits, -nr+naive WILLNEED, -nr+daemon policies)
 - [ ] P6.4 Co-tenant probe app
 - [ ] P6.5 Python metric parsers + report table, with tests
 - [ ] P6.6 `make demo`, `make bench` entry points
