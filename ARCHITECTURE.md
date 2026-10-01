@@ -41,8 +41,8 @@
 | `mp-sim` | trace-driven simulator: byte-capacity cache, FIFO I/O channel, policies (LRU, LFU, prefix-pin, static-freq oracle, V-residency, V+prefetch, Belady) | mp-core, mp-trace |
 | `mp-os` | `PageCacheOps` and `ResidencyProbe` traits. Linux impls (mincore, cachestat, fadvise, mlock, process_madvise, /proc/pid/maps lookup). Mock impl | libc |
 | `mp-recorder` | mincore full-scan diff recorder, sentinel recorder, page→expert conversion, bpftrace output ingest | mp-gguf, mp-os, mp-trace |
-| `moepager` (bin) | CLI: `gguf-map`, `synth`, `analyze`, `sim`, `record`, `ingest-bpftrace`, `page2expert`, `replay`, `fault-io` | all |
-| `moepagerd` (bin) | daemon skeleton: config, event loop, dry-run on traces, live mode (untested) | mp-core, mp-os, mp-recorder |
+| `moepager` (bin) | CLI: `gguf-map`, `synth`, `analyze`, `sim`, `trace-csv`, `record`, `ingest-bpftrace`, `page2expert`, `replay`, `fault-io` | all |
+| `moepagerd` (lib + bin) | daemon: policies `none`, `willneed-all` (B5), `lru-pin` (B6), `v` (D1–D3); trace or sentinel sources; mock or Linux ops; graceful SIGINT; live mode untested against llama.cpp | mp-core, mp-os, mp-recorder |
 | `python/moepager_tools` | independent GGUF fixture writer (cross-checks the Rust parser), bench metric parsers, plots | stdlib (+matplotlib optional) |
 | `bench/` | cgroup v2 runner, llama.cpp baseline matrix, co-tenant probe, metric collection | bash, python |
 
@@ -128,6 +128,11 @@ other slices. It is modelled in the simulator as demand misses served at
 | `cachestat` per slice | owner/writer of file | resident count + `recently_evicted` (refaults) per slice | per call | probe implemented and tested |
 | DAMON / page_idle (hits) | root | accessed bits → **hits** | sampling | future (phase 8), would enable `full` observation |
 
+Page→expert conversion only counts pages at least 128 KiB inside a slice.
+Neighbouring experts get pulled in by read-around, by readahead (4 MiB
+windows on btrfs here) and by whole compressed extents (btrfs zstd); see
+PHASES.md known issues.
+
 Token boundaries are inferred in black-box traces: a new token starts when
 the observed layer index drops below the previous one by more than a
 threshold. Experts at layer 0 are evidence of a new token.
@@ -136,9 +141,9 @@ threshold. Experts at layer 0 are evidence of a new token.
 
 | op | Linux mechanism | privilege | notes |
 |---|---|---|---|
-| `prefetch(range)` | `posix_fadvise(WILLNEED)` on the file fd | none | populates the shared page cache. The engine takes a minor fault |
+| `prefetch(range)` | `posix_fadvise(WILLNEED)` on the file fd, **in 128 KiB chunks** | none | populates the shared page cache. The engine takes a minor fault. The kernel truncates each call to `max(io_pages, ra_pages)`, hence the chunking |
 | `pin(range)` / `unpin` | `mlock`/`munlock` on the daemon's own `MAP_SHARED` read-only mapping | `CAP_IPC_LOCK` or `RLIMIT_MEMLOCK` | the shared folio becomes unevictable for every mapper |
-| `demote(range)` | `process_madvise(pidfd, MADV_COLD)` on the engine's mapping (address found through `/proc/pid/maps` inode match) | `CAP_SYS_NICE` + ptrace-read | `fadvise(DONTNEED)` doesn't work on mapped pages (verified) |
+| `demote(range)` | `process_madvise(pidfd, MADV_COLD)` on the engine's mapping (address found through `/proc/pid/maps`, matched by inode + device-or-path; btrfs reports different devices in `stat()` and maps) | `CAP_SYS_NICE` + ptrace-read | `fadvise(DONTNEED)` doesn't work on mapped pages (verified) |
 | `residency(range)` | `mincore` / `cachestat` | none / owner | probes |
 
 All ops go through the trait. `MockOps` records calls and simulates
