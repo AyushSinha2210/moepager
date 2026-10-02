@@ -82,7 +82,7 @@ phase 5 (OS layer, recorder, daemon skeleton).
 - [x] P6.6 `make demo`, `make bench` entry points
 
 ### Phase 7 — Go/no-go on real hardware (NEXT after this session)
-- [ ] P7.1 Ground-truth expert trace capture tool (libllama eval callback on `ffn_moe_topk-*`), experiment-only
+- [ ] P7.1 Ground-truth expert trace capture tool (libllama eval callback on `ffn_moe_topk-*`) + `moepager import-csv`, experiment-only (see docs/RUNBOOK_GO_NO_GO.md)
 - [ ] P7.2 Download models (OLMoE, Qwen3-30B-A3B Q4_K_M, gpt-oss-20b MXFP4); build llama.cpp
 - [ ] P7.3 Experiment A: simulator sweeps on real traces
 - [ ] P7.4 Experiment B: `moepager replay` under memory.max versus simulator LRU (validation)
