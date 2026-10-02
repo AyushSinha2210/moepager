@@ -4,23 +4,41 @@ Exact steps to run experiments A–D from IDEA_REVIEW §6 and decide against
 kill criteria K1–K4. Everything up to this point has been built and tested
 without a model. This is the first phase that needs one.
 
-## 0. Prerequisites
+## 0. Prerequisites & Environment Verification
+
+### Environment Checklist
+Before launching benchmark runs, verify host environment conditions:
+- **Cgroup v2 Delegation**: Verify user memory delegation with `systemd-run --user --scope -p MemoryMax=1G true`.
+- **PSI Support**: Confirm pressure stall information is active: `cat /proc/pressure/memory`.
+- **NVMe Readahead**: Check device readahead size with `cat /sys/block/<nvme-dev>/queue/read_ahead_kb` (typically 128 KiB).
+- **ZRAM/Swap State**: Inspect swap configuration with `swapon --show`. For page-cache runs, disable swap inside the scope via `-p MemorySwapMax=0`.
 
 ```bash
 # llama.cpp (CPU build). Record the commit hash in the results.
 git clone https://github.com/ggml-org/llama.cpp ~/llama.cpp
 cmake -S ~/llama.cpp -B ~/llama.cpp/build -DCMAKE_BUILD_TYPE=Release && cmake --build ~/llama.cpp/build -j
+
 # Models (≈ 4 + 18.6 + 12.1 GB; check free disk first)
 huggingface-cli download allenai/OLMoE-1B-7B-0924-GGUF olmoe-1b-7b-0924-q4_k_m.gguf --local-dir ~/models
 huggingface-cli download unsloth/Qwen3-30B-A3B-GGUF Qwen3-30B-A3B-Q4_K_M.gguf --local-dir ~/models
 huggingface-cli download ggml-org/gpt-oss-20b-GGUF gpt-oss-20b-MXFP4.gguf --local-dir ~/models
+
 make build
 for m in ~/models/*.gguf; do target/release/moepager gguf-map "$m"; done   # check the repack warning
 ```
 
-Note the filesystem: btrfs here has a 4 MiB readahead window and zstd
-compression, which change fault behaviour. Prefer also running on ext4
-(e.g. a loop-mounted ext4 image on the same NVMe) and report both.
+### Loop-Mounted ext4 Image (for Btrfs hosts)
+Btrfs uses large readahead windows (4 MiB) and extent compression (zstd) which alter fault dynamics. To isolate standard block-layer behavior, optionally mount a loopback ext4 image:
+
+```bash
+# Create and mount a 30 GB ext4 loopback image
+truncate -s 30G /tmp/ext4_scratch.img
+mkfs.ext4 /tmp/ext4_scratch.img
+mkdir -p ~/mnt/ext4_models
+sudo mount -o loop /tmp/ext4_scratch.img ~/mnt/ext4_models
+sudo chown $USER:$USER ~/mnt/ext4_models
+cp ~/models/Qwen3-30B-A3B-Q4_K_M.gguf ~/mnt/ext4_models/
+```
 
 ## 1. P7.1 — ground-truth expert traces (experiment-only instrumentation)
 
