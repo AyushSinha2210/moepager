@@ -29,6 +29,30 @@
                                                 └ MockOps (tests, dry-run)
 ```
 
+### 1.1 Event Lifecycle Sequence
+
+```text
+llama.cpp            Linux Kernel           moepagerd (mp-core)          Disk I/O
+   │                      │                          │                      │
+   │─── faults on page ──►│                          │                      │
+   │    of slice (up)     │── pulls in page ─────────┼─────────────────────►│
+   │                      │                          │                      │
+   │                      │◄── mincore sentinel poll ┤                      │
+   │                      │    detects resident page │                      │
+   │                      │                          │                      │
+   │                      │                          │── Expert (l, e) seen │
+   │                      │                          │   • Update stats     │
+   │                      │                          │   • Rank V(e) value  │
+   │                      │                          │                      │
+   │                      │◄── posix_fadvise(WILLNEED)                      │
+   │                      │    issued for gate + down slices in 128 KiB ───►│
+   │                      │                          │    (Bulk read ahead) │
+   │                      │                          │                      │
+   │─── minor fault on ──►│ (already resident        │                      │
+   │    gate/down slices  │  in page cache)          │                      │
+   ▼                      ▼                          ▼                      ▼
+```
+
 ## 2. Components
 
 | crate | role | depends on |
