@@ -164,6 +164,7 @@ dependencies = [
  "mp-gguf",
  "mp-os",
  "mp-recorder",
+ "mp-synth",
  "mp-trace",
  "serde",
  "serde_json",
