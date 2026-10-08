@@ -235,3 +235,16 @@ residency, so the daemon loop is unit-tested deterministically.
 
 Anything that needs root, eBPF, `CAP_*`, llama.cpp or a real model is listed
 under "Known issues / untested on real hardware" in PHASES.md.
+
+
+---
+
+### Memory Budget Partitioning
+
+```
+Total Memory Budget (C)
+|-- Dense Regions (~0.5 - 1.2 GB) [Always Hot: Attention, Norms, Routers, Embeddings]
+|-- Pinned Expert Units (C_pin)   [Locked in RAM via mlock]
+`-- Dynamic Readahead Headroom    [Temporary folios populated by WILLNEED readahead]
+```
+

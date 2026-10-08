@@ -44,3 +44,6 @@ docker run --rm \
   -v /path/to/models:/models:ro \
   moepager:latest /models/model.gguf --policy v
 ```
+
+#### How does context window length impact moepager?
+During initial prompt evaluation (prefill), all prompt tokens are processed in batch mode, generating high burst cache misses across all layers. During token generation (decode), expert activation follows steady per-token top-$ sparsity, where (e)$ residency stabilization achieves maximal speedup.

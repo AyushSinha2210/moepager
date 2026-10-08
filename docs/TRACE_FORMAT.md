@@ -107,3 +107,22 @@ For passive traces (`sentinel`, `bpftrace`, `mincore-scan`) where token boundari
   ```bash
   moepager page2expert page_trace.mpt --map map.json -o expert_trace.mpt
   ```
+
+
+---
+
+## Python Trace Parser Example
+Read binary .mpt traces directly in Python without dependencies:
+```python
+import struct, json
+
+def read_mpt(path):
+    with open(path, "rb") as f:
+        magic, version, kind, hlen = struct.unpack("<8sHHI", f.read(16))
+        header = json.loads(f.read(hlen).decode("utf-8"))
+        while chunk := f.read(16 if kind == 1 else 24):
+            if kind == 1:
+                t_ns, token, layer, expert = struct.unpack("<QIH H", chunk)
+                yield {"t_ns": t_ns, "token": token, "layer": layer, "expert": expert}
+```
+

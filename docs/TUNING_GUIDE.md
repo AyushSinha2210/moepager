@@ -62,3 +62,11 @@ moepagerd \
   --hysteresis 1.20 \
   --prefetch completion,predict
 ```
+
+---
+
+### Profile C: Cloud VM with High-IOPS NVMe (e.g. AWS i3en / GCP c3-highmem)
+- When backing storage provides $>4\text{ GB/s}$ sustained sequential I/O:
+  - Set --prefetch completion,predict
+  - Reduce --replan-every to 2 tokens to capture bursty routing patterns
+  - Set --pin-budget-bytes to 50% of expert bytes

@@ -73,3 +73,12 @@ WantedBy=default.target
 
 - **Memory Starvation**: Pinning too much memory starves co-tenant applications. The pin budget (`--pin-budget-bytes`) must always be explicitly bounded below free memory.
 - **Data Integrity**: `moepager` opens files in read-only mode (`O_RDONLY`). Neither `posix_fadvise` nor `process_madvise(MADV_COLD)` can corrupt memory or disk data.
+
+
+---
+
+## AppArmor & SELinux Profiles
+On distributions enforcing LSMs (AppArmor on Ubuntu/Debian, SELinux on Fedora/RHEL):
+- SELinux: Ensure the unconfined_service_t or container policy allows ptrace checks for process_madvise cross-process signaling.
+- AppArmor: Add capability ipc_lock, capability sys_nice, to /etc/apparmor.d/usr.local.bin.moepagerd.
+

@@ -32,3 +32,11 @@ Before submitting a pull request, ensure the following criteria are satisfied:
   `docs/PRIVILEGES.md`.
 - Code that can't be tested here (root, eBPF, real engine) is marked
   `// UNTESTED-ON-HW:` and listed in PHASES.md "Known issues".
+
+
+---
+
+## Pull Request Review Standards
+- Every PR must verify that synthetic trace simulator runs produce deterministic results.
+- Any new actuator operation added to mp-os must provide a corresponding MockOps test fixture.
+

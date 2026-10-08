@@ -36,3 +36,13 @@ A reference guide for technical terminology used throughout the `moepager` proje
 - **$V(e)$ Value Metric**: The estimated value per byte of keeping expert unit $e$ pinned in memory, balancing miss probability against unit size and I/O fault latency:
   $$V(e) = \frac{\text{rate}(e) \cdot (t_{\text{fault}} + s_e / B_{\text{demand}})}{s_e}$$
 - **Bélady's MIN\* Oracle**: The theoretical upper bound cache replacement policy that replaces the item whose next reference occurs furthest in the future, modified for variable-sized expert units.
+
+---
+
+### Mathematical Formulations
+
+- **EWMA Access Rate ($\text{rate}_t(e)$)**:
+  \text{rate}_t(e) = \alpha \cdot \mathbf{1}_{\{e \in U_t\}} + (1 - \alpha) \cdot \text{rate}_{t-1}(e)
+  where $\alpha = 1 - 2^{-1 / H}$ with half-life $ tokens.
+- **Value Metric (e)$**:
+  V(e) = \frac{\text{rate}(e) \cdot (t_{\text{fault}} + s_e / B_{\text{demand}})}{s_e}
