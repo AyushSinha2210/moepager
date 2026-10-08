@@ -7,18 +7,41 @@ where useful.
 
 ## Current status
 
-Phase 0 (idea review) done: **verdict KEEP, MODIFIED** (see IDEA_REVIEW.md).
-Phases 2–4 done:
-- GGUF expert map, verified on real Qwen3/gpt-oss/OLMoE headers;
-- trace format, synthetic generator and analyzer;
-- mp-core policy code and the simulator with Belady*.
+**Phases 0–6 are complete. This is the planned ~50 % stop point.**
 
-Simulated LRU agrees exactly with the analyzer's LRU curve. Working on
-phase 5 (OS layer, recorder, daemon skeleton).
+- Phase 0 verdict: **KEEP, MODIFIED** (IDEA_REVIEW.md §7).
+- Built and tested without a model, root or llama.cpp:
+  - GGUF expert map (verified on real Qwen3-30B-A3B, gpt-oss-20b and OLMoE
+    headers; maps in `data/maps/`);
+  - `.mpt` trace format; synthetic generator; analyzer with exact LRU curve;
+  - mp-core policy code; simulator with Belady\* (LRU cross-checked exactly
+    against the analyzer);
+  - OS layer (mincore, cachestat, chunked WILLNEED, mlock,
+    process_madvise);
+  - sentinel and scan recorders (end to end on a real file);
+  - bpftrace script and ingest;
+  - daemon (mock dry runs and a live smoke run against the replayer);
+  - rootless cgroup runner, llama.cpp matrix script, metric parsers,
+    co-tenant probe;
+  - `make demo` / `make bench` / `make microbench`.
+- Tests: 80 Rust + 12 Python, all passing; CI green (fmt, clippy, tests,
+  ruff, pytest, demo).
+- Measured so far (smoke only): fault-driven expert reads 0.44–0.49 GB/s
+  with 3.3–3.7× amplification, versus 2.37–2.46 GB/s for chunked WILLNEED
+  on the dev laptop (BENCHMARKS.md). K2 does not fire on this machine.
 
 ## Next up
 
-- P5.1–P5.2: mp-os traits, MockOps, Linux probes and actuators.
+**Phase 7, the go/no-go on real hardware.** Follow
+docs/RUNBOOK_GO_NO_GO.md:
+1. P7.1: write the ground-truth capture tool (libllama `cb_eval` on
+   `ffn_moe_topk-*`) and `moepager import-csv`.
+2. P7.2: build llama.cpp, download OLMoE / Qwen3-30B-A3B / gpt-oss-20b.
+3. P7.3–P7.6: experiments A–D. Expect to debug `bench/run_llama.sh` on
+   its first real run.
+4. P7.7: decide against K1–K4 and log it below.
+
+Do not start phase 8+ before P7.7.
 
 ## Phases
 
@@ -30,14 +53,14 @@ phase 5 (OS layer, recorder, daemon skeleton).
 - [x] P0.5 Back-of-envelope, counter-arguments, go/no-go design with kill criteria
 - [x] P0.6 Write IDEA_REVIEW.md, RELATED_WORK.md
 
-### Phase 1 — Scaffold and docs
+### Phase 1 — Scaffold and docs ✅
 - [x] P1.1 PRD, ARCHITECTURE, PHASES, BENCHMARKS, README, CONTRIBUTING, trace spec, ADRs, PRIVILEGES
 - [x] P1.2 Cargo workspace, crate skeletons, rustfmt/clippy config
 - [x] P1.3 Python package skeleton (pyproject, ruff, pytest)
 - [x] P1.4 Makefile (`test`, `lint`, `demo`, `bench`)
 - [x] P1.5 CI workflow (fmt, clippy, tests, ruff, pytest, demo smoke)
 
-### Phase 2 — GGUF map
+### Phase 2 — GGUF map ✅
 - [x] P2.1 ggml type table (block size, type size) incl. K-quants, IQ, MXFP4
 - [x] P2.2 GGUF v2/v3 header parser (metadata KV, tensor infos, alignment, data offset)
 - [x] P2.3 Python independent fixture writer + generated fixtures
@@ -46,7 +69,7 @@ phase 5 (OS layer, recorder, daemon skeleton).
 - [x] P2.6 `moepager gguf-map` CLI → map.json + summary
 - [x] P2.7 Repack-risk detection (types × host CPU flags) with warning
 
-### Phase 3 — Traces, synthetic generator, analyzer
+### Phase 3 — Traces, synthetic generator, analyzer ✅
 - [x] P3.1 Trace format spec + reader/writer (expert and page records), CSV export
 - [x] P3.2 Token-boundary inference for black-box traces
 - [x] P3.3 Deterministic RNG (SplitMix64/xoshiro256**) + Zipf sampler
@@ -55,7 +78,7 @@ phase 5 (OS layer, recorder, daemon skeleton).
 - [x] P3.6 Analyzer: transitions + top-m recall, token reuse, popularity, per-layer timing
 - [x] P3.7 `moepager synth` / `moepager analyze` CLIs
 
-### Phase 4 — Simulator and policies
+### Phase 4 — Simulator and policies ✅
 - [x] P4.1 mp-core OnlineStats (full and miss-only observation regimes)
 - [x] P4.2 mp-core ResidencyEngine (V(e), budget, hysteresis, exploration)
 - [x] P4.3 mp-core PrefetchPlanner (transition scores, deadline budget) + completion readahead flag
@@ -64,7 +87,7 @@ phase 5 (OS layer, recorder, daemon skeleton).
 - [x] P4.6 Cross-check: simulated LRU == analyzer MRC
 - [x] P4.7 `moepager sim` CLI: policy × budget sweep → CSV/markdown table
 
-### Phase 5 — Recorder and daemon skeleton
+### Phase 5 — Recorder and daemon skeleton ✅
 - [x] P5.1 mp-os traits + MockOps
 - [x] P5.2 Linux probes: mincore, cachestat; Linux ops: fadvise, mlock, process_madvise, /proc/pid/maps lookup
 - [x] P5.3 Full-scan mincore diff recorder (page trace)
@@ -73,7 +96,7 @@ phase 5 (OS layer, recorder, daemon skeleton).
 - [x] P5.6 moepagerd: config, event loop, dry-run on traces with MockOps
 - [x] P5.7 moepagerd: live mode wiring (sentinel source + LinuxOps) — untested on real engine
 
-### Phase 6 — Benchmark harness
+### Phase 6 — Benchmark harness ✅
 - [x] P6.1 `moepager replay` (mmap replay of an expert trace on a real file) + `moepager fault-io` microbench
 - [x] P6.2 cgroup v2 runner (`systemd-run --user`, memory.max) and metric snapshots (vmstat, diskstats, PSI, memory.stat)
 - [x] P6.3 llama.cpp baseline matrix script (default, -nr, -nr+mlock where fits, -nr+naive WILLNEED, -nr+daemon policies)
@@ -81,7 +104,7 @@ phase 5 (OS layer, recorder, daemon skeleton).
 - [x] P6.5 Python metric parsers + report table, with tests
 - [x] P6.6 `make demo`, `make bench` entry points
 
-### Phase 7 — Go/no-go on real hardware (NEXT after this session)
+### Phase 7 — Go/no-go on real hardware ← NEXT
 - [ ] P7.1 Ground-truth expert trace capture tool (libllama eval callback on `ffn_moe_topk-*`) + `moepager import-csv`, experiment-only (see docs/RUNBOOK_GO_NO_GO.md)
 - [ ] P7.2 Download models (OLMoE, Qwen3-30B-A3B Q4_K_M, gpt-oss-20b MXFP4); build llama.cpp
 - [ ] P7.3 Experiment A: simulator sweeps on real traces
@@ -95,6 +118,8 @@ phase 5 (OS layer, recorder, daemon skeleton).
 - [ ] P8.2 Live actuators hardened (mlock budget accounting, process_madvise demotion, fallback chain)
 - [ ] P8.3 Same-cgroup enforcement and accounting checks
 - [ ] P8.4 Optional DAMON-assisted hit observation (root)
+- [ ] P8.5 `MADV_POPULATE_READ` worker fallback for prefetch when WILLNEED is ineffective
+- [ ] P8.6 Compute-time (not wall-time) layer estimate for the prefetch deadline budget
 
 ### Phase 9 — Co-tenant protection
 - [ ] P9.1 PSI-driven budget controller (`/proc/pressure/memory`, cgroup `memory.pressure`)
@@ -110,6 +135,22 @@ phase 5 (OS layer, recorder, daemon skeleton).
 - Auto-tuning `read_ahead_kb` / `MADV_RANDOM` for the dense part.
 
 ## Known issues / untested on real hardware
+
+**Untested on real hardware (no llama.cpp, model, root or extra
+capabilities in the dev session):**
+- anything against a running llama.cpp: live daemon (`moepagerd --ops
+  linux --source sentinel`), `bench/run_llama.sh`, and the B0–D3 configs;
+- `bpf/moepager.bt` (needs root/bpftrace) and the bpftrace ingest on real
+  output (only on sample text);
+- pinning beyond the 8 MB `RLIMIT_MEMLOCK` (needs `CAP_IPC_LOCK`) and
+  `process_madvise(MADV_COLD)` demotion (needs `CAP_SYS_NICE`);
+- MGLRU-off baseline B3 (needs root);
+- co-tenant probe under real memory pressure;
+- simulator fidelity versus the real kernel (Experiment B), and every
+  routing statistic of real models (all traces so far are synthetic);
+- the repack claim (measure RSS anon vs file with and without `-nr`).
+
+**Known issues:**
 
 - Repack default: llama.cpp on AVX2 repacks Q4_0/Q4_K/IQ4_NL/MXFP4 into
   anonymous memory. moepager needs `--no-repack`. Verified from source only,
@@ -168,3 +209,5 @@ phase 5 (OS layer, recorder, daemon skeleton).
 | 2026-09-29 | Prefetch reframed around expert-completion readahead; prediction prefetch kept behind a flag | fault-io smoke run: ≈4× bandwidth gap between mmap faults and bulk WILLNEED. Simulator: prediction wastes ≈0.4 GB/token on synthetic traces |
 | 2026-09-29 | Simulator cost defaults = measured dev-laptop numbers (0.45 / 2.0 GB/s) | Replace guessed 1 / 3 GB/s with measurements; re-measure per machine |
 | 2026-09-30 | Chunk WILLNEED into 128 KiB requests | The kernel truncates each WILLNEED to the device readahead size (found via CI) |
+| 2026-10-01 | Bulk bandwidth default 2.4 GB/s (chunked WILLNEED smoke) | Re-measured after the chunking fix |
+| 2026-10-08 | Stop at end of phase 6 (≈50 %) | Planned scope. Deferred to later phases: real-hardware runs (P7), live eBPF/daemon hardening (P8), PSI tuning (P9), dashboard (P10) |
