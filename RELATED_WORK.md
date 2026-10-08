@@ -65,6 +65,20 @@ from page-cache misses (§C) and acts only on the shared page cache.
 | `--cpu-moe`, `--n-cpu-moe`, `-ot` | place expert tensors on CPU buffers (GPU setups). A reported side effect: experts in anonymous memory |
 | `--no-mmap-prefetch` (PR #29250) | skips the load-time whole-file WILLNEED |
 
+## A caveat when comparing with prior WILLNEED results
+
+Several negative results above concern WILLNEED-style prefetch:
+- routhjim's "within 1.5 % of nothing";
+- the 0.3–5 % gains in arXiv 2608.12103.
+
+The kernel silently truncates each `posix_fadvise(WILLNEED)` /
+`madvise(MADV_WILLNEED)` request to `max(bdi->io_pages, ra->ra_pages)`
+(often 128 KiB, see IDEA_REVIEW §1.4). A single call covering a whole
+multi-MB expert therefore prefetches only its head unless it is split. We
+don't know whether those works split their requests. Phase 7 should
+reproduce their setup both ways before treating their results as priors
+for moepager.
+
 ## What exactly is new here
 
 1. **A GGUF-structure map used as an OS-level policy input.** It covers
