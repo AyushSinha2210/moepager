@@ -100,8 +100,10 @@ docs/PRIVILEGES.md.
 [IDEA_REVIEW](IDEA_REVIEW.md) · [RELATED_WORK](RELATED_WORK.md) ·
 [BENCHMARKS](BENCHMARKS.md) · [ADRs](docs/adr) ·
 [trace format](docs/TRACE_FORMAT.md) · [privileges](docs/PRIVILEGES.md) ·
-[CONTRIBUTING](CONTRIBUTING.md)
+[Tuning Guide](docs/TUNING_GUIDE.md) · [FAQ](docs/FAQ.md) ·
+[Glossary](docs/GLOSSARY.md) · [Deep Dive](docs/ARCHITECTURE_DEEP_DIVE.md) · [Troubleshooting](docs/TROUBLESHOOTING.md) · [Compatibility](docs/MODEL_COMPATIBILITY.md) · [CONTRIBUTING](CONTRIBUTING.md)
 
 ## License
 
 Dual-licensed under MIT or Apache-2.0, at your option.
+

@@ -29,6 +29,30 @@
                                                 └ MockOps (tests, dry-run)
 ```
 
+### 1.1 Event Lifecycle Sequence
+
+```text
+llama.cpp            Linux Kernel           moepagerd (mp-core)          Disk I/O
+   │                      │                          │                      │
+   │─── faults on page ──►│                          │                      │
+   │    of slice (up)     │── pulls in page ─────────┼─────────────────────►│
+   │                      │                          │                      │
+   │                      │◄── mincore sentinel poll ┤                      │
+   │                      │    detects resident page │                      │
+   │                      │                          │                      │
+   │                      │                          │── Expert (l, e) seen │
+   │                      │                          │   • Update stats     │
+   │                      │                          │   • Rank V(e) value  │
+   │                      │                          │                      │
+   │                      │◄── posix_fadvise(WILLNEED)                      │
+   │                      │    issued for gate + down slices in 128 KiB ───►│
+   │                      │                          │    (Bulk read ahead) │
+   │                      │                          │                      │
+   │─── minor fault on ──►│ (already resident        │                      │
+   │    gate/down slices  │  in page cache)          │                      │
+   ▼                      ▼                          ▼                      ▼
+```
+
 ## 2. Components
 
 | crate | role | depends on |
@@ -211,3 +235,16 @@ residency, so the daemon loop is unit-tested deterministically.
 
 Anything that needs root, eBPF, `CAP_*`, llama.cpp or a real model is listed
 under "Known issues / untested on real hardware" in PHASES.md.
+
+
+---
+
+### Memory Budget Partitioning
+
+```
+Total Memory Budget (C)
+|-- Dense Regions (~0.5 - 1.2 GB) [Always Hot: Attention, Norms, Routers, Embeddings]
+|-- Pinned Expert Units (C_pin)   [Locked in RAM via mlock]
+`-- Dynamic Readahead Headroom    [Temporary folios populated by WILLNEED readahead]
+```
+
